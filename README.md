@@ -12,8 +12,7 @@ like this is that I am particular about a few things:
   when plotting maps), but still work within a strict dimensional constraint
   over the entire figure (e.g. I want to make a figure to fit in a column of a
   manuscript).
-- In figures where I use a colorbar for all the panels, I want tight control
-  over its length and thickness.  I want to make sure that the colorbars in all
+- I want to make sure that the colorbars in all
   of my figures have the same thickness throughout my presentations or
   manuscripts; unfortunately it is hard to control this using the default 
   `matplotlib` tools (you can set the thickness in relative space, but you 
@@ -35,8 +34,8 @@ needs over the years.  Others have found it useful as well, so I am posting it
 on GitHub as is for now, and may work on it more if I have the time and
 motivation.
 
-Another project, with a similar motivation is <`panel-plots`
-https://github.com/ajdawson/panel-plots>_; however it does not have any support
+Another project, with a similar motivation is [panel-plots](
+https://github.com/ajdawson/panel-plots); however it does not have any support
 for adding colorbars.
 
 Example usage
@@ -75,6 +74,7 @@ axes[5].set_xticklabels(np.arange(0., 18.1, 3.))
 
 fig.savefig('facets_example.png', bbox_inches='tight')
 ```
+![facets_example.png](facets_example.png?raw=true)
 
 Here is an example of using `facets` to create a plot with a colorbar.  Note
 that we are using the default `cbar_thickness`, which is set to an eighth of an
@@ -110,3 +110,4 @@ cbar = mpl.colorbar.ColorbarBase(cax, cmap=cmap,
 cbar.set_label('Example')
 fig.savefig('facets_example2.png', bbox_inches='tight')
 ```
+![facets_example2.png](facets_example2.png?raw=true)
