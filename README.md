@@ -34,7 +34,7 @@ needs over the years.  Others have found it useful as well, so I am posting it
 on GitHub as is for now, and may work on it more if I have the time and
 motivation.
 
-Another project, with a similar motivation is [panel-plots](
+Another project with a similar motivation is [panel-plots](
 https://github.com/ajdawson/panel-plots); however it does not have any support
 for adding colorbars.
 
