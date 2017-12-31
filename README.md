@@ -1,6 +1,8 @@
 facets
 ------
 
+[![Build Status](https://travis-ci.org/spencerkclark/facets.svg?branch=master)](https://travis-ci.org/spencerkclark/facets)
+
 This is a module that I use in practice
 to produce both single and multi-panel figures for presentations and
 manuscripts. The reason I have gone through the trouble to write something

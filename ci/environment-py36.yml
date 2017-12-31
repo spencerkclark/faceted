@@ -1,0 +1,11 @@
+name: test_env
+channels:
+    - conda-forge
+dependencies:
+    - python=3.6
+    - matplotlib
+    - numpy
+    - pytest
+    - pip:
+      - coveralls
+      - pytest-cov
