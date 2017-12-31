@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from facets.facets import (Tile, BasicGrid, ColorbarGrid, MultiColorbarGrid,
-                           facets)
+from facets import Tile, BasicGrid, ColorbarGrid, MultiColorbarGrid, facets
 
 
 plt.switch_backend('agg')
