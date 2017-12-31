@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from facets.facets import Tile, BasicGrid, ColorbarGrid, MultiColorbarGrid
+from facets.facets import (Tile, BasicGrid, ColorbarGrid, MultiColorbarGrid,
+                           facets)
 
 
 plt.switch_backend('agg')
@@ -432,3 +433,22 @@ def test_multicolorbar_grid_caxes_bounds(multicolorbar_grid):
 def test_multicolorbar_grid_invalid_cbar_location():
     with pytest.raises(ValueError):
         MultiColorbarGrid(1, 1, cbar_location='invalid')
+
+
+def test_facets_cbar_mode_none():
+    fig, axes = facets(1, 2)
+    assert len(axes) == 2
+    plt.close(fig)
+
+
+def test_facets_cbar_mode_figure():
+    fig, axes, cax = facets(1, 2, cbar_mode='figure')
+    assert len(axes) == 2
+    plt.close(fig)
+
+
+def test_facets_cbar_mode_tile():
+    fig, axes, caxes = facets(1, 2, cbar_mode='tile')
+    assert len(axes) == 2
+    assert len(axes) == len(caxes)
+    plt.close(fig)
