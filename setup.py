@@ -32,5 +32,5 @@ setuptools.setup(
         'matplotlib >= 1.5',
         'numpy >= 1.7',
     ],
-    scripts=['facets/examples/Examples.ipynb']
+    scripts=['facets/examples/examples.ipynb']
 )
