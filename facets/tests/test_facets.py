@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from facets.facets import Tile, BasicGrid, ColorbarGrid
+from facets.facets import Tile, BasicGrid, ColorbarGrid, MultiColorbarGrid
 
 
 plt.switch_backend('agg')
@@ -206,8 +206,8 @@ def test_colorbar_grid_axes_bounds(colorbar_grid):
               col * (_INTERNAL_PAD + tile_width)) / width
         y0 = (colorbar_grid.bottom_pad +
               row * (_INTERNAL_PAD + tile_height)) / height
-        x = colorbar_grid.tile_width / width
-        y = colorbar_grid.tile_height / height
+        x = tile_width / width
+        y = tile_height / height
         expected_bounds = [x0, y0, x, y]
         np.testing.assert_allclose(ax_bounds, expected_bounds)
 
@@ -245,3 +245,178 @@ def test_colorbar_grid_cax_bounds(colorbar_grid):
 def test_colorbar_grid_invalid_cbar_location():
     with pytest.raises(ValueError):
         ColorbarGrid(1, 1, cbar_location='invalid')
+
+
+_MCG_LAYOUTS = product(_LAYOUTS, ['bottom', 'top', 'left', 'right'])
+_MCG_IDS = {layout: str(layout) for layout in _MCG_LAYOUTS}
+
+
+@pytest.fixture(params=_MCG_IDS.keys(), ids=_MCG_IDS.values())
+def multicolorbar_grid(request):
+    (rows, cols), cbar_location = request.param
+    mcg = MultiColorbarGrid(
+        rows, cols, width_constraint=_WIDTH_CONSTRAINT,
+        aspect=_ASPECT, top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
+        left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
+        internal_pad=_INTERNAL_PAD, long_side_pad=_LONG_SIDE_PAD,
+        short_side_pad=_SHORT_SIDE_PAD, cbar_thickness=_CBAR_THICKNESS,
+        cbar_location=cbar_location)
+    yield mcg
+
+    # Close figure to prevent too many open figures warning
+    plt.close(mcg.fig)
+
+
+def test_multicolorbar_grid_outer_padding(multicolorbar_grid):
+    # Outer padding goes un-modified for a MultiColorbarGrid
+    assert _LEFT_PAD == multicolorbar_grid.left_pad
+    assert _RIGHT_PAD == multicolorbar_grid.right_pad
+    assert _TOP_PAD == multicolorbar_grid.top_pad
+    assert _BOTTOM_PAD == multicolorbar_grid.bottom_pad
+
+
+def test_multicolorbar_tile_width(multicolorbar_grid):
+    cols = multicolorbar_grid.cols
+    if multicolorbar_grid.cbar_location in ['bottom', 'top', 'left', 'right']:
+        expected = (_WIDTH_CONSTRAINT - _LEFT_PAD - _RIGHT_PAD -
+                    _INTERNAL_PAD * (cols - 1)) / cols
+    assert expected == multicolorbar_grid.tile_width
+
+
+def test_multicolorbar_tile_height(multicolorbar_grid):
+    tile_width = multicolorbar_grid.tile_width
+    if multicolorbar_grid.cbar_location in ['bottom', 'top']:
+        expected = tile_width * _ASPECT + _CBAR_THICKNESS + _LONG_SIDE_PAD
+    elif multicolorbar_grid.cbar_location in ['left', 'right']:
+        expected = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) * _ASPECT
+    assert expected == multicolorbar_grid.tile_height
+
+
+def test_multicolorbar_grid_figure_width(multicolorbar_grid):
+    expected_figure_width = _WIDTH_CONSTRAINT
+    result_width, _ = multicolorbar_grid.fig.get_size_inches()
+    assert expected_figure_width == result_width
+    assert expected_figure_width == multicolorbar_grid.width
+
+
+def test_multicolorbar_grid_figure_height(multicolorbar_grid):
+    rows = multicolorbar_grid.rows
+    expected_figure_height = (
+        rows * multicolorbar_grid.tile_height + (rows - 1) * _INTERNAL_PAD +
+        _BOTTOM_PAD + _TOP_PAD)
+    _, result_height = multicolorbar_grid.fig.get_size_inches()
+    assert expected_figure_height == result_height
+    assert expected_figure_height == multicolorbar_grid.height
+
+
+def test_multicolorbar_grid_axes_bounds(multicolorbar_grid):
+    rows = multicolorbar_grid.rows
+    cols = multicolorbar_grid.cols
+    fig = multicolorbar_grid.fig
+    width = multicolorbar_grid.width
+    height = multicolorbar_grid.height
+    tile_width = multicolorbar_grid.tile_width
+    tile_height = multicolorbar_grid.tile_height
+    cbar_location = multicolorbar_grid.cbar_location
+
+    indexes = list(product(range(rows - 1, -1, -1), range(cols)))
+    axes, _ = multicolorbar_grid.axes()
+    if cbar_location == 'bottom':
+        for ax, (row, col) in zip(axes, indexes):
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
+            y0 = (_BOTTOM_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD +
+                  row * (_INTERNAL_PAD + tile_height)) / height
+            x = tile_width / width
+            y = (tile_height - _CBAR_THICKNESS - _LONG_SIDE_PAD) / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(ax_bounds, expected_bounds)
+    elif cbar_location == 'top':
+        for ax, (row, col) in zip(axes, indexes):
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
+            x = tile_width / width
+            y = (tile_height - _CBAR_THICKNESS - _LONG_SIDE_PAD) / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(ax_bounds, expected_bounds)
+    elif cbar_location == 'right':
+        for ax, (row, col) in zip(axes, indexes):
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
+            x = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
+            y = tile_height / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(ax_bounds, expected_bounds)
+    elif cbar_location == 'left':
+        for ax, (row, col) in zip(axes, indexes):
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD +
+                  col * (_INTERNAL_PAD + tile_width)) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
+            x = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
+            y = tile_height / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(ax_bounds, expected_bounds)
+
+
+def test_multicolorbar_grid_caxes_bounds(multicolorbar_grid):
+    rows = multicolorbar_grid.rows
+    cols = multicolorbar_grid.cols
+    fig = multicolorbar_grid.fig
+    width = multicolorbar_grid.width
+    height = multicolorbar_grid.height
+    tile_width = multicolorbar_grid.tile_width
+    tile_height = multicolorbar_grid.tile_height
+    cbar_location = multicolorbar_grid.cbar_location
+
+    indexes = list(product(range(rows - 1, -1, -1), range(cols)))
+    _, caxes = multicolorbar_grid.axes()
+    if cbar_location == 'bottom':
+        for cax, (row, col) in zip(caxes, indexes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width) +
+                  _SHORT_SIDE_PAD) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
+            x = (tile_width - 2. * _SHORT_SIDE_PAD) / width
+            y = _CBAR_THICKNESS / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    elif cbar_location == 'top':
+        for cax, (row, col) in zip(caxes, indexes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width) +
+                  _SHORT_SIDE_PAD) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
+                  tile_height - _CBAR_THICKNESS) / height
+            x = (tile_width - 2. * _SHORT_SIDE_PAD) / width
+            y = _CBAR_THICKNESS / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    elif cbar_location == 'right':
+        for cax, (row, col) in zip(caxes, indexes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width) + tile_width -
+                  _CBAR_THICKNESS) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
+                  _SHORT_SIDE_PAD) / height
+            x = _CBAR_THICKNESS / width
+            y = (tile_height - 2. * _SHORT_SIDE_PAD) / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    elif cbar_location == 'left':
+        for cax, (row, col) in zip(caxes, indexes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
+                  _SHORT_SIDE_PAD) / height
+            x = _CBAR_THICKNESS / width
+            y = (tile_height - 2. * _SHORT_SIDE_PAD) / height
+            expected_bounds = [x0, y0, x, y]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+
+
+def test_multicolorbar_grid_invalid_cbar_location():
+    with pytest.raises(ValueError):
+        MultiColorbarGrid(1, 1, cbar_location='invalid')
