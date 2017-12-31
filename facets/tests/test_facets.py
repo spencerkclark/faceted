@@ -44,11 +44,15 @@ _IDS = {layout: str(layout) for layout in _LAYOUTS}
 @pytest.fixture(params=_IDS.keys(), ids=_IDS.values())
 def basic_grid(request):
     rows, cols = request.param
-    return BasicGrid(
+    bg =  BasicGrid(
         rows, cols, width_constraint=_WIDTH_CONSTRAINT,
         aspect=_ASPECT, top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
         left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
         internal_pad=_INTERNAL_PAD)
+    yield bg
+
+    # Close figure to prevent too many open figures warning
+    plt.close(bg.fig)
 
 
 def test_basic_grid_tile_width(basic_grid):
@@ -103,20 +107,24 @@ def test_basic_grid_axes_bounds(basic_grid):
 _SHORT_SIDE_PAD = 0.25
 _LONG_SIDE_PAD = 0.25
 _CBAR_THICKNESS = 0.125
-_CG_LAYOUTS = product(_LAYOUTS, ['bottom', 'right'])
+_CG_LAYOUTS = product(_LAYOUTS, ['bottom', 'right', 'top', 'left'])
 _CG_IDS = {layout: str(layout) for layout in _CG_LAYOUTS}
 
 
 @pytest.fixture(params=_CG_IDS.keys(), ids=_CG_IDS.values())
 def colorbar_grid(request):
     (rows, cols), cbar_location = request.param
-    return ColorbarGrid(
+    cg = ColorbarGrid(
         rows, cols, width_constraint=_WIDTH_CONSTRAINT,
         aspect=_ASPECT, top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
         left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
         internal_pad=_INTERNAL_PAD, long_side_pad=_LONG_SIDE_PAD,
         short_side_pad=_SHORT_SIDE_PAD, cbar_thickness=_CBAR_THICKNESS,
         cbar_location=cbar_location)
+    yield cg
+
+    # Close figure to prevent too many open figures warning
+    plt.close(cg.fig)
 
 
 def test_colorbar_grid_left_pad(colorbar_grid):
@@ -214,11 +222,26 @@ def test_colorbar_grid_cax_bounds(colorbar_grid):
         x0 = (_LEFT_PAD + _SHORT_SIDE_PAD) / width
         y0 = _BOTTOM_PAD / height
         x = (width - _LEFT_PAD - _RIGHT_PAD - 2. * _SHORT_SIDE_PAD) / width
-        y = _CBAR_THICKNESS / colorbar_grid.height
+        y = _CBAR_THICKNESS / height
     elif colorbar_grid.cbar_location == 'right':
         x0 = (width - _CBAR_THICKNESS - _RIGHT_PAD) / width
         y0 =  (_BOTTOM_PAD + _SHORT_SIDE_PAD) / height
         x = _CBAR_THICKNESS / width
         y = (height - _TOP_PAD - _BOTTOM_PAD - 2. * _SHORT_SIDE_PAD) / height
+    elif colorbar_grid.cbar_location == 'top':
+        x0 = (_LEFT_PAD + _SHORT_SIDE_PAD) / width
+        y0 = (height - _CBAR_THICKNESS - _TOP_PAD) / height
+        x = (width - _LEFT_PAD - _RIGHT_PAD - 2. * _SHORT_SIDE_PAD) / width
+        y = _CBAR_THICKNESS / height
+    elif colorbar_grid.cbar_location == 'left':
+        x0 = _LEFT_PAD / width
+        y0 = (_BOTTOM_PAD + _SHORT_SIDE_PAD) / height
+        x = _CBAR_THICKNESS / width
+        y = (height - _TOP_PAD - _BOTTOM_PAD - 2. * _SHORT_SIDE_PAD) / height
     expected_bounds = [x0, y0, x, y]
     np.testing.assert_allclose(cax_bounds, expected_bounds)
+
+
+def test_colorbar_grid_invalid_cbar_location():
+    with pytest.raises(ValueError):
+        ColorbarGrid(1, 1, cbar_location='invalid')

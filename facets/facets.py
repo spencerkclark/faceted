@@ -324,21 +324,31 @@ class ColorbarGrid(BaseGrid):
     def add_colorbar(self):
         width = self.width
         height = self.height
-        if self.cbar_location == 'bottom':
+        if self.cbar_location in ['top', 'bottom']:
             cbar_width = (width - 2. * self.short_side_pad - self.left_pad -
                           self.right_pad) / width
             cbar_height = self.cbar_thickness / height
             cbar_x0 = (self.left_pad + self.short_side_pad) / width
-            cbar_y0 = (self.bottom_pad - self.cbar_thickness -
-                       self.long_side_pad) / height
-        elif self.cbar_location == 'right':
+        elif self.cbar_location in ['left', 'right']:
             cbar_height = (height - 2. * self.short_side_pad - self.top_pad -
                            self.bottom_pad) / height
             cbar_width = self.cbar_thickness / width
-            cbar_x0 = (width - self.right_pad + self.long_side_pad) / width
             cbar_y0 = (self.bottom_pad + self.short_side_pad) / height
         else:
-            raise NotImplementedError('Need to implement left and top modes')
+            raise ValueError('Invalid cbar_location')
+
+        if self.cbar_location == 'bottom':
+            cbar_y0 = (self.bottom_pad - self.cbar_thickness -
+                       self.long_side_pad) / height
+        elif self.cbar_location == 'right':
+            cbar_x0 = (width - self.right_pad + self.long_side_pad) / width
+        elif self.cbar_location == 'top':
+            cbar_y0 = (height - self.top_pad + self.long_side_pad) / height
+        elif self.cbar_location == 'left':
+            cbar_x0 = (self.left_pad - self.cbar_thickness -
+                       self.long_side_pad) / width
+        else:
+            raise ValueError('Invalid cbar_location')
         return self.fig.add_axes([cbar_x0, cbar_y0, cbar_width, cbar_height])
 
     @property
