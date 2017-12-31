@@ -42,7 +42,7 @@ def format_layout(layout):
     return 'rows={}-cols={}'.format(rows, cols)
 
 
-_LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (3, 5)]
+_LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
 _IDS = {layout: format_layout(layout) for layout in _LAYOUTS}
 
 
