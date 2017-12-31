@@ -4,11 +4,7 @@ from itertools import product
 import numpy as np
 import pytest
 
-<<<<<<< HEAD
 from facets.facets import Tile, BasicGrid, ColorbarGrid
-=======
-from facets.facets import Tile, BasicGrid
->>>>>>> master
 
 
 @pytest.fixture
