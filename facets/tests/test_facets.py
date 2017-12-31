@@ -1,10 +1,14 @@
 """Test suite for facets module"""
 from itertools import product
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 from facets.facets import Tile, BasicGrid, ColorbarGrid
+
+
+plt.switch_backend('agg')
 
 
 @pytest.fixture
