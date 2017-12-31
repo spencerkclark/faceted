@@ -334,8 +334,6 @@ class ColorbarGrid(BaseGrid):
                            self.bottom_pad) / height
             cbar_width = self.cbar_thickness / width
             cbar_y0 = (self.bottom_pad + self.short_side_pad) / height
-        else:
-            raise ValueError('Invalid cbar_location')
 
         if self.cbar_location == 'bottom':
             cbar_y0 = (self.bottom_pad - self.cbar_thickness -
@@ -347,8 +345,6 @@ class ColorbarGrid(BaseGrid):
         elif self.cbar_location == 'left':
             cbar_x0 = (self.left_pad - self.cbar_thickness -
                        self.long_side_pad) / width
-        else:
-            raise ValueError('Invalid cbar_location')
         return self.fig.add_axes([cbar_x0, cbar_y0, cbar_width, cbar_height])
 
     @property
@@ -410,8 +406,6 @@ class MultiColorbarGrid(ColorbarGrid):
         elif self.cbar_location in ['left', 'right']:
             return (self.tile_width - self.cbar_thickness -
                     self.long_side_pad) * self.aspect
-        else:
-            raise ValueError('Invalid cbar_location')
 
     @property
     def axes_bounds(self):
@@ -437,8 +431,6 @@ class MultiColorbarGrid(ColorbarGrid):
 
             plot_y0 = 0.
             cbar_y0 = self.short_side_pad / self.tile_height
-        else:
-            raise ValueError('Invalid cbar_location')
 
         if self.cbar_location == 'bottom':
             plot_y0 = (self.cbar_thickness +
@@ -454,8 +446,6 @@ class MultiColorbarGrid(ColorbarGrid):
         elif self.cbar_location == 'right':
             plot_x0 = 0.
             cbar_x0 = plot_width + self.long_side_pad / self.tile_width
-        else:
-            raise ValueError('Invalid cbar_location')
 
         return ([plot_x0, plot_y0, plot_width, plot_height],
                 [cbar_x0, cbar_y0, cbar_width, cbar_height])
