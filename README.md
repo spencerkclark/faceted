@@ -174,6 +174,3 @@ fig.savefig('multi-colorbar-grid-example.png')
 ```
 
 ![multi-colorbar-grid-example.png](facets/examples/multi-colorbar-grid-example.png?raw=true)
-
-Some examples of the current API can be found in the Jupyter notebook in this
-repository. 
