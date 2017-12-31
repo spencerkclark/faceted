@@ -86,14 +86,14 @@ def test_basic_grid_axes_bounds(basic_grid):
     fig = basic_grid.fig
     width = basic_grid.width
     height = basic_grid.height
+    tile_width = basic_grid.tile_width
+    tile_height = basic_grid.tile_height
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     for ax, (row, col) in zip(basic_grid.axes(), indexes):
         ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
-        x0 = (_LEFT_PAD +
-              col * (_INTERNAL_PAD + basic_grid.tile_width)) / width
-        y0 = (_BOTTOM_PAD +
-              row * (_INTERNAL_PAD + basic_grid.tile_height)) / height
+        x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
+        y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
         x = basic_grid.tile_width / width
         y = basic_grid.tile_height / height
         expected_bounds = [x0, y0, x, y]
@@ -187,15 +187,17 @@ def test_colorbar_grid_axes_bounds(colorbar_grid):
     fig = colorbar_grid.fig
     width = colorbar_grid.width
     height = colorbar_grid.height
+    tile_width = colorbar_grid.tile_width
+    tile_height = colorbar_grid.tile_height
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     axes, _ = colorbar_grid.axes()
     for ax, (row, col) in zip(axes, indexes):
         ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
         x0 = (colorbar_grid.left_pad +
-              col * (_INTERNAL_PAD + colorbar_grid.tile_width)) / width
+              col * (_INTERNAL_PAD + tile_width)) / width
         y0 = (colorbar_grid.bottom_pad +
-              row * (_INTERNAL_PAD + colorbar_grid.tile_height)) / height
+              row * (_INTERNAL_PAD + tile_height)) / height
         x = colorbar_grid.tile_width / width
         y = colorbar_grid.tile_height / height
         expected_bounds = [x0, y0, x, y]
@@ -210,7 +212,7 @@ def test_colorbar_grid_cax_bounds(colorbar_grid):
     cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
     if colorbar_grid.cbar_location == 'bottom':
         x0 = (_LEFT_PAD + _SHORT_SIDE_PAD) / width
-        y0 =  _BOTTOM_PAD / height
+        y0 = _BOTTOM_PAD / height
         x = (width - _LEFT_PAD - _RIGHT_PAD - 2. * _SHORT_SIDE_PAD) / width
         y = _CBAR_THICKNESS / colorbar_grid.height
     elif colorbar_grid.cbar_location == 'right':
