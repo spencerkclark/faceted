@@ -324,21 +324,27 @@ class ColorbarGrid(BaseGrid):
     def add_colorbar(self):
         width = self.width
         height = self.height
-        if self.cbar_location == 'bottom':
+        if self.cbar_location in ['top', 'bottom']:
             cbar_width = (width - 2. * self.short_side_pad - self.left_pad -
                           self.right_pad) / width
             cbar_height = self.cbar_thickness / height
             cbar_x0 = (self.left_pad + self.short_side_pad) / width
-            cbar_y0 = (self.bottom_pad - self.cbar_thickness -
-                       self.long_side_pad) / height
-        elif self.cbar_location == 'right':
+        elif self.cbar_location in ['left', 'right']:
             cbar_height = (height - 2. * self.short_side_pad - self.top_pad -
                            self.bottom_pad) / height
             cbar_width = self.cbar_thickness / width
-            cbar_x0 = (width - self.right_pad + self.long_side_pad) / width
             cbar_y0 = (self.bottom_pad + self.short_side_pad) / height
-        else:
-            raise NotImplementedError('Need to implement left and top modes')
+
+        if self.cbar_location == 'bottom':
+            cbar_y0 = (self.bottom_pad - self.cbar_thickness -
+                       self.long_side_pad) / height
+        elif self.cbar_location == 'right':
+            cbar_x0 = (width - self.right_pad + self.long_side_pad) / width
+        elif self.cbar_location == 'top':
+            cbar_y0 = (height - self.top_pad + self.long_side_pad) / height
+        elif self.cbar_location == 'left':
+            cbar_x0 = (self.left_pad - self.cbar_thickness -
+                       self.long_side_pad) / width
         return self.fig.add_axes([cbar_x0, cbar_y0, cbar_width, cbar_height])
 
     @property
@@ -384,9 +390,12 @@ class MultiColorbarGrid(ColorbarGrid):
     @property
     def tile_width(self):
         """The width of a Tile in the grid object"""
-        return (self.width_constraint -
-                (self.internal_pad * (self.cols - 1) +
-                 self.left_pad + self.right_pad)) / self.cols
+        if self.cbar_location in ['bottom', 'top', 'left', 'right']:
+            return (self.width_constraint -
+                    (self.internal_pad * (self.cols - 1) +
+                     self.left_pad + self.right_pad)) / self.cols
+        else:
+            raise ValueError('Invalid cbar_location')
 
     @property
     def tile_height(self):
@@ -395,14 +404,13 @@ class MultiColorbarGrid(ColorbarGrid):
             return (self.tile_width * self.aspect +
                     self.cbar_thickness + self.long_side_pad)
         elif self.cbar_location in ['left', 'right']:
-            raise NotImplementedError('TODO')
-        else:
-            raise ValueError('Unsupported cbar_location provided')
+            return (self.tile_width - self.cbar_thickness -
+                    self.long_side_pad) * self.aspect
 
     @property
     def axes_bounds(self):
-        if self.cbar_location == 'bottom':
-            plot_width = self.tile_width / self.tile_width
+        if self.cbar_location in ['bottom', 'top']:
+            plot_width = 1.
             plot_height = (self.tile_width *
                            self.aspect) / self.tile_height
 
@@ -411,16 +419,36 @@ class MultiColorbarGrid(ColorbarGrid):
             cbar_height = self.cbar_thickness / self.tile_height
 
             plot_x0 = 0.
+            cbar_x0 = self.short_side_pad / self.tile_width
+        elif self.cbar_location in ['left', 'right']:
+            plot_width = (self.tile_width - self.cbar_thickness -
+                          self.long_side_pad) / self.tile_width
+            plot_height = 1.
+
+            cbar_width = self.cbar_thickness / self.tile_width
+            cbar_height = (self.tile_height -
+                           2. * self.short_side_pad) / self.tile_height
+
+            plot_y0 = 0.
+            cbar_y0 = self.short_side_pad / self.tile_height
+
+        if self.cbar_location == 'bottom':
             plot_y0 = (self.cbar_thickness +
                        self.long_side_pad) / self.tile_height
-
-            cbar_x0 = (self.short_side_pad) / self.tile_width
             cbar_y0 = 0.
+        elif self.cbar_location == 'top':
+            plot_y0 = 0.
+            cbar_y0 = plot_height + self.long_side_pad / self.tile_height
+        elif self.cbar_location == 'left':
+            plot_x0 = (self.cbar_thickness +
+                       self.long_side_pad) / self.tile_width
+            cbar_x0 = 0.
+        elif self.cbar_location == 'right':
+            plot_x0 = 0.
+            cbar_x0 = plot_width + self.long_side_pad / self.tile_width
 
-            return ([plot_x0, plot_y0, plot_width, plot_height],
-                    [cbar_x0, cbar_y0, cbar_width, cbar_height])
-        else:
-            raise NotImplementedError('TODO')
+        return ([plot_x0, plot_y0, plot_width, plot_height],
+                [cbar_x0, cbar_y0, cbar_width, cbar_height])
 
     def axes(self, **add_axes_kwargs):
         """Creates the axes associated with all tiles in the grid

@@ -2,6 +2,7 @@ facets
 ------
 
 [![Build Status](https://travis-ci.org/spencerkclark/facets.svg?branch=master)](https://travis-ci.org/spencerkclark/facets)
+[![Coverage Status](https://coveralls.io/repos/github/spencerkclark/facets/badge.svg?branch=master)](https://coveralls.io/github/spencerkclark/facets?branch=master)
 
 This is a module that I use in practice
 to produce both single and multi-panel figures for presentations and
@@ -24,15 +25,9 @@ like this is that I am particular about a few things:
 I have recently re-written the entire module to make it easier to add different
 layouts.  Previously, the only two layouts enabled were a basic grid layout
 with no colorbar, and a grid layout with a common colorbar at the bottom of the
-figure.  In addition to those, I have now added support for a common colorbar
-on the right of the figure, and colorbars at the bottom for every subplot in
-the figure.
-
-It should be straightforward to enable other colorbar positions (e.g. left
-and top in the common colorbar case, and left, right, and top in the multiple
-colobar case), but I have not gotten to that yet.  Other layouts like colorbars
-on the ends of rows of subplots or columns of subplots should be possible
-to add without too much effort too.
+figure.  Now one could add a common colorbar to the bottom, left, top, or right
+of the figure, or one can add colorbars to each panel (also on the bottom,
+left, top, or right).
 
 Another project with a similar motivation is [panel-plots](
 https://github.com/ajdawson/panel-plots); however it does not have support
@@ -47,5 +42,4 @@ using `fig.add_axes(rect)` (as is done in `panel-plots`) is a much cleaner way o
 specific sizes and positions than what was implemented here previously.
 
 Some examples of the current API can be found in the Jupyter notebook in this
-repository.  Eventually it would nice to add tests and a more formal package
-structure to this project, but I am just posting it as is for now.
+repository.
