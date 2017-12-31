@@ -451,3 +451,8 @@ def test_facets_cbar_mode_tile():
     assert len(axes) == 2
     assert len(axes) == len(caxes)
     plt.close(fig)
+
+
+def test_facets_cbar_mode_invalid():
+    with pytest.raises(ValueError):
+        facets(1, 2, cbar_mode='invalid')
