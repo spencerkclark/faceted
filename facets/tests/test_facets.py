@@ -37,8 +37,13 @@ _ASPECT = 0.5
 _WIDTH_CONSTRAINT = 8.
 
 
+def format_layout(layout):
+    rows, cols = layout
+    return 'rows={}-cols={}'.format(rows, cols)
+
+
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (3, 5)]
-_IDS = {layout: str(layout) for layout in _LAYOUTS}
+_IDS = {layout: format_layout(layout) for layout in _LAYOUTS}
 
 
 @pytest.fixture(params=_IDS.keys(), ids=_IDS.values())
@@ -108,7 +113,14 @@ _SHORT_SIDE_PAD = 0.25
 _LONG_SIDE_PAD = 0.25
 _CBAR_THICKNESS = 0.125
 _CG_LAYOUTS = product(_LAYOUTS, ['bottom', 'right', 'top', 'left'])
-_CG_IDS = {layout: str(layout) for layout in _CG_LAYOUTS}
+
+
+def format_layout_cbar(layout):
+    (rows, cols), cbar_loc = layout
+    return 'rows={}-cols={}-cbar_location={!r}'.format(rows, cols, cbar_loc)
+
+
+_CG_IDS = {layout: format_layout_cbar(layout) for layout in _CG_LAYOUTS}
 
 
 @pytest.fixture(params=_CG_IDS.keys(), ids=_CG_IDS.values())
@@ -248,7 +260,7 @@ def test_colorbar_grid_invalid_cbar_location():
 
 
 _MCG_LAYOUTS = product(_LAYOUTS, ['bottom', 'top', 'left', 'right'])
-_MCG_IDS = {layout: str(layout) for layout in _MCG_LAYOUTS}
+_MCG_IDS = {layout: format_layout_cbar(layout) for layout in _MCG_LAYOUTS}
 
 
 @pytest.fixture(params=_MCG_IDS.keys(), ids=_MCG_IDS.values())
