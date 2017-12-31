@@ -28,6 +28,6 @@ install:
   - pip install -e .
 
 script:
-  - py.test aospy --cov=facets --cov-report term-missing --verbose
+  - py.test facets --cov=facets --cov-report term-missing --verbose
 after_success:
   - coveralls
