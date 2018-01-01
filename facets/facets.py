@@ -4,6 +4,82 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
+           bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
+           cbar_mode=None, cbar_short_side_pad=0.5, cbar_long_side_pad=0.5,
+           cbar_thickness=0.125, cbar_location='right', axes_kwargs={}):
+    """Create figure and tiled axes objects with precise attributes
+
+    Parameters
+    ----------
+    rows : int
+        Number of rows of tiles in figure
+    cols : int
+        Number of columns of tiles in figure
+    width : float
+        Width of figure
+    aspect : float
+        Aspect ratio of plots in each tile
+    top_pad : float
+        Spacing (in inches) between top of figure and axes
+    bottom_pad : float
+        Spacing (in inches) between bottom of figure and axes
+    left_pad : float
+        Spacing (in inches) between left of figure and axes
+    right_pad : float
+        Spacing (in inches) between right of figure and axes
+    internal_pad : float
+        Spacing in between tiles (in inches)
+    cbar_mode : {None, 'figure', 'tile'}
+        Mode for adding colorbar(s) to figure
+    cbar_short_side_pad : float
+        Spacing between the ends of the colorbar and the edges
+        of the axes (in inches); controls the length of the
+        colorbar
+    cbar_long_side_pad : float
+        Spacing between plot axes and the colorbar axes (in inches)
+    cbar_thickness : float
+        Width of the colorbar in inches
+    cbar_location : {'top', 'bottom', 'left', 'right'}
+        Side of the plot axes (or figure) for the colorbar
+    axes_kwargs : dict
+        Keyword arguments to pass to ``fig.add_axes()`` when creating
+        the plot axes for each tile (e.g. for specifying a Cartopy projection).
+
+    Returns
+    -------
+    fig, axes, caxes (if caxes requested)
+    """
+    if cbar_mode is None:
+        bg = BasicGrid(
+            rows, cols, width_constraint=width, aspect=aspect,
+            top_pad=top_pad, bottom_pad=bottom_pad,
+            left_pad=left_pad, right_pad=right_pad, internal_pad=internal_pad)
+        return bg.fig, bg.axes(**axes_kwargs)
+    elif cbar_mode == 'figure':
+        cg = ColorbarGrid(
+            rows, cols, width_constraint=width, aspect=aspect,
+            top_pad=top_pad, bottom_pad=bottom_pad, left_pad=left_pad,
+            right_pad=right_pad, internal_pad=internal_pad,
+            short_side_pad=cbar_short_side_pad,
+            long_side_pad=cbar_long_side_pad, cbar_thickness=cbar_thickness,
+            cbar_location=cbar_location)
+        axes, cax = cg.axes(**axes_kwargs)
+        return cg.fig, axes, cax
+    elif cbar_mode == 'tile':
+        mcg = MultiColorbarGrid(
+            rows, cols, width_constraint=width, aspect=aspect,
+            top_pad=top_pad, bottom_pad=bottom_pad, left_pad=left_pad,
+            right_pad=right_pad, internal_pad=internal_pad,
+            short_side_pad=cbar_short_side_pad,
+            long_side_pad=cbar_long_side_pad, cbar_thickness=cbar_thickness,
+            cbar_location=cbar_location)
+        axes, cax = mcg.axes(**axes_kwargs)
+        return mcg.fig, axes, cax
+    else:
+        raise ValueError('Invalid cbar_mode specified')
+
+
 class Tile(object):
     def __init__(self, x0, y0, width, height, axes_bounds):
         """Create a Tile object
