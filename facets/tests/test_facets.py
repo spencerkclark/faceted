@@ -461,13 +461,13 @@ def test_facets_cbar_mode_invalid():
 
 
 @pytest.fixture(params=_CG_IDS.keys(), ids=_CG_IDS.values())
-def wcag(request):
+def grid(request):
     (rows, cols), location = request.param
     obj = WidthConstrainedAxesGrid(
         rows, cols, width=_WIDTH_CONSTRAINT, aspect=_ASPECT,
         top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
         left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
-        cbar_mode='each', cbar_pad=_LONG_SIDE_PAD,
+        cbar_mode='single', cbar_pad=_LONG_SIDE_PAD,
         axes_pad=_INTERNAL_PAD, cbar_location=location,
         cbar_size=_CBAR_THICKNESS,
         cbar_short_side_pad=_SHORT_SIDE_PAD)
@@ -481,46 +481,127 @@ def get_position(ax):
     return position
 
 
-def test_width_constrained_axes_grid_axes_positions(wcag):
-    rows = wcag.rows
-    cols = wcag.cols
-    width = wcag.width
-    height = wcag.height
-    tile_width = (wcag.width - wcag.left_pad - wcag.right_pad
-                  - (cols - 1) * _INTERNAL_PAD) / cols
-    tile_height = (wcag.height - wcag.top_pad - wcag.bottom_pad -
-                   (rows - 1) * _INTERNAL_PAD) / rows
-    cbar_location = wcag.cbar_location
+def get_tile_width(grid, left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD):
+    return (grid.width - left_pad - right_pad
+            - (grid.cols - 1) * _INTERNAL_PAD) / grid.cols
+
+
+def get_tile_height(grid, bottom_pad=_BOTTOM_PAD, top_pad=_TOP_PAD):
+    return (grid.height - bottom_pad - top_pad -
+            (grid.rows - 1) * _INTERNAL_PAD) / grid.rows
+
+
+def test_width_constrained_axes_positions(grid):
+    if grid.cbar_mode == 'each':
+        check_width_constrained_axes_positions_each(grid)
+    elif grid.cbar_mode == 'single':
+        check_width_constrained_axes_positions_single(grid)
+
+
+def test_width_constrained_caxes_positions(grid):
+    if grid.cbar_mode == 'each':
+        check_width_constrained_caxes_positions_each(grid)
+    elif grid.cbar_mode == 'single':
+        check_width_constrained_caxes_positions_single(grid)
+
+
+def check_width_constrained_axes_positions_single(grid):
+    rows, cols = grid.rows, grid.cols
+    width, height = grid.width, grid.height
+    cbar_location = grid.cbar_location
+
+    left_pad, right_pad = _LEFT_PAD, _RIGHT_PAD
+    bottom_pad, top_pad = _BOTTOM_PAD, _TOP_PAD
+    if cbar_location == 'left':
+        left_pad = _LEFT_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD
+    elif cbar_location == 'right':
+        right_pad = _RIGHT_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD
+    elif cbar_location == 'bottom':
+        bottom_pad = _BOTTOM_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD
+    elif cbar_location == 'top':
+        top_pad = _TOP_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD
+
+    tile_width = get_tile_width(grid, left_pad=left_pad, right_pad=right_pad)
+    tile_height = get_tile_height(grid, bottom_pad=bottom_pad, top_pad=top_pad)
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
-    axes = wcag.axes
+    axes = grid.axes
+    for ax, (row, col) in zip(axes, indexes):
+        ax_bounds = get_position(ax).bounds
+        x0 = (left_pad + col * (_INTERNAL_PAD + tile_width)) / width
+        y0 = (bottom_pad + row * (_INTERNAL_PAD + tile_height)) / height
+        dx = tile_width / width
+        dy = tile_height / height
+        expected_bounds = [x0, y0, dx, dy]
+        np.testing.assert_allclose(ax_bounds, expected_bounds)
+
+
+def check_width_constrained_caxes_positions_single(grid):
+    width, height = grid.width, grid.height
+    cbar_location = grid.cbar_location
+    fig = grid.fig
+
+    cax = grid.caxes
+    cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+    if cbar_location == 'bottom':
+        x0 = (_LEFT_PAD + _SHORT_SIDE_PAD) / width
+        y0 = _BOTTOM_PAD / height
+        dx = (width - _LEFT_PAD - _RIGHT_PAD - 2. * _SHORT_SIDE_PAD) / width
+        dy = _CBAR_THICKNESS / height
+    elif cbar_location == 'right':
+        x0 = (width - _CBAR_THICKNESS - _RIGHT_PAD) / width
+        y0 = (_BOTTOM_PAD + _SHORT_SIDE_PAD) / height
+        dx = _CBAR_THICKNESS / width
+        dy = (height - _TOP_PAD - _BOTTOM_PAD - 2. * _SHORT_SIDE_PAD) / height
+    elif cbar_location == 'top':
+        x0 = (_LEFT_PAD + _SHORT_SIDE_PAD) / width
+        y0 = (height - _CBAR_THICKNESS - _TOP_PAD) / height
+        dx = (width - _LEFT_PAD - _RIGHT_PAD - 2. * _SHORT_SIDE_PAD) / width
+        dy = _CBAR_THICKNESS / height
+    elif cbar_location == 'left':
+        x0 = _LEFT_PAD / width
+        y0 = (_BOTTOM_PAD + _SHORT_SIDE_PAD) / height
+        dx = _CBAR_THICKNESS / width
+        dy = (height - _TOP_PAD - _BOTTOM_PAD - 2. * _SHORT_SIDE_PAD) / height
+    expected_bounds = [x0, y0, dx, dy]
+    np.testing.assert_allclose(cax_bounds, expected_bounds)
+
+
+def check_width_constrained_axes_positions_each(grid):
+    rows, cols = grid.rows, grid.cols
+    width, height = grid.width, grid.height
+    tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
+    cbar_location = grid.cbar_location
+
+    indexes = list(product(range(rows - 1, -1, -1), range(cols)))
+    axes = grid.axes
     if cbar_location == 'bottom':
         for ax, (row, col) in zip(axes, indexes):
             ax_bounds = get_position(ax).bounds
             x0 = (_LEFT_PAD + col * (tile_width + _INTERNAL_PAD)) / width
             y0 = (_BOTTOM_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD +
                   row * (tile_height + _INTERNAL_PAD)) / height
-            x = tile_width / width
-            y = (tile_height - _CBAR_THICKNESS - _LONG_SIDE_PAD) / height
-            expected_bounds = [x0, y0, x, y]
+            dx = tile_width / width
+            dy = (tile_height - _CBAR_THICKNESS - _LONG_SIDE_PAD) / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == 'top':
         for ax, (row, col) in zip(axes, indexes):
             ax_bounds = get_position(ax).bounds
             x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
-            x = tile_width / width
-            y = (tile_height - _CBAR_THICKNESS - _LONG_SIDE_PAD) / height
-            expected_bounds = [x0, y0, x, y]
+            dx = tile_width / width
+            dy = (tile_height - _CBAR_THICKNESS - _LONG_SIDE_PAD) / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == 'right':
         for ax, (row, col) in zip(axes, indexes):
             ax_bounds = get_position(ax).bounds
             x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
-            x = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
-            y = tile_height / height
-            expected_bounds = [x0, y0, x, y]
+            dx = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
+            dy = tile_height / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == 'left':
         for ax, (row, col) in zip(axes, indexes):
@@ -528,35 +609,30 @@ def test_width_constrained_axes_grid_axes_positions(wcag):
             x0 = (_LEFT_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD +
                   col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
-            x = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
-            y = tile_height / height
-            expected_bounds = [x0, y0, x, y]
+            dx = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
+            dy = tile_height / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(ax_bounds, expected_bounds)
 
 
-def test_width_constrained_axes_grid_caxes_positions(wcag):
-    rows = wcag.rows
-    cols = wcag.cols
-    width = wcag.width
-    height = wcag.height
-    tile_width = (wcag.width - wcag.left_pad - wcag.right_pad
-                  - (cols - 1) * _INTERNAL_PAD) / cols
-    tile_height = (wcag.height - wcag.top_pad - wcag.bottom_pad -
-                   (rows - 1) * _INTERNAL_PAD) / rows
-    cbar_location = wcag.cbar_location
-    fig = wcag.fig
+def check_width_constrained_caxes_positions_each(grid):
+    rows, cols = grid.rows, grid.cols
+    width, height = grid.width, grid.height
+    tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
+    cbar_location = grid.cbar_location
+    fig = grid.fig
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
-    caxes = wcag.caxes
+    caxes = grid.caxes
     if cbar_location == 'bottom':
         for cax, (row, col) in zip(caxes, indexes):
             cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
             x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width) +
                   _SHORT_SIDE_PAD) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
-            x = (tile_width - 2. * _SHORT_SIDE_PAD) / width
-            y = _CBAR_THICKNESS / height
-            expected_bounds = [x0, y0, x, y]
+            dx = (tile_width - 2. * _SHORT_SIDE_PAD) / width
+            dy = _CBAR_THICKNESS / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == 'top':
         for cax, (row, col) in zip(caxes, indexes):
@@ -565,9 +641,9 @@ def test_width_constrained_axes_grid_caxes_positions(wcag):
                   _SHORT_SIDE_PAD) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
                   tile_height - _CBAR_THICKNESS) / height
-            x = (tile_width - 2. * _SHORT_SIDE_PAD) / width
-            y = _CBAR_THICKNESS / height
-            expected_bounds = [x0, y0, x, y]
+            dx = (tile_width - 2. * _SHORT_SIDE_PAD) / width
+            dy = _CBAR_THICKNESS / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == 'right':
         for cax, (row, col) in zip(caxes, indexes):
@@ -576,9 +652,9 @@ def test_width_constrained_axes_grid_caxes_positions(wcag):
                   _CBAR_THICKNESS) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
                   _SHORT_SIDE_PAD) / height
-            x = _CBAR_THICKNESS / width
-            y = (tile_height - 2. * _SHORT_SIDE_PAD) / height
-            expected_bounds = [x0, y0, x, y]
+            dx = _CBAR_THICKNESS / width
+            dy = (tile_height - 2. * _SHORT_SIDE_PAD) / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == 'left':
         for cax, (row, col) in zip(caxes, indexes):
@@ -586,7 +662,7 @@ def test_width_constrained_axes_grid_caxes_positions(wcag):
             x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
                   _SHORT_SIDE_PAD) / height
-            x = _CBAR_THICKNESS / width
-            y = (tile_height - 2. * _SHORT_SIDE_PAD) / height
-            expected_bounds = [x0, y0, x, y]
+            dx = _CBAR_THICKNESS / width
+            dy = (tile_height - 2. * _SHORT_SIDE_PAD) / height
+            expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(cax_bounds, expected_bounds)

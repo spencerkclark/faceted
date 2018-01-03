@@ -112,11 +112,13 @@ class WidthConstrainedAxesGrid(object):
         self.cbar_pad = cbar_pad
         self.cbar_location = cbar_location
 
-        # For some reason when the colorbar is placed at the bottom and
-        # the colorbar mode is 'single', AxesGrid adds an extra vertical
+        # For some reason when the colorbar is placed at the bottom or left
+        # and the colorbar mode is 'single', AxesGrid adds an extra
         # axes pad to the colorbar padding; we correct this manually here.
         if self.cbar_location == 'bottom' and self.cbar_mode == 'single':
             self.cbar_pad = self.cbar_pad - self.axes_pad[1]
+        elif self.cbar_location == 'left' and self.cbar_mode == 'single':
+            self.cbar_pad = self.cbar_pad - self.axes_pad[0]
 
         self.cbar_short_side_pad = cbar_short_side_pad
 
