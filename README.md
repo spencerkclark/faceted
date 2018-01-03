@@ -31,13 +31,13 @@ relative) space.
 
 Another project with a similar motivation is [panel-plots](
 https://github.com/ajdawson/panel-plots); however it does not have support
-for adding colorbars to a dimensionally-constrained figure (it does not use
-`AxesGrid` internally).  One part of the implementation there that inspired
-part of what is done here is the ability to add user-settable padding to the 
-edges of the figure (to add space for axes ticks, ticklabels, and labels). 
-This eliminates the need for using `bbox_inches='tight'` when saving the 
-figure, and enables the user to make sure that their figures are
-*exactly* the dimensions they need for their use.
+for adding colorbars to a dimensionally-constrained figure.  One part of the 
+implementation there that inspired part of what is done here is the ability 
+to add user-settable padding to the edges of the figure (to add space for 
+axes ticks, ticklabels, and labels).  This eliminates the need for using 
+`bbox_inches='tight'` when saving the figure, and enables the user 
+to make sure that their figures are *exactly* the dimensions 
+they need for their use.
 
 Examples
 --------
