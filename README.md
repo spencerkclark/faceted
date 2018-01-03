@@ -23,29 +23,21 @@ like this is that I am particular about a few things:
   manuscript).
 - I want to make sure that the colorbars in all
   of my figures have the same thickness throughout my presentations or
-  manuscripts; unfortunately it is hard to control this using the default 
-  `matplotlib` tools (you can set the thickness in relative space, but you 
-  need to be careful about what that means within the context of your 
-  figure size).
+  manuscripts.
 
-I have recently re-written the entire module to make it easier to add different
-layouts.  Previously, the only two layouts enabled were a basic grid layout
-with no colorbar, and a grid layout with a common colorbar at the bottom of the
-figure.  Now one could add a common colorbar to the bottom, left, top, or right
-of the figure, or one can add colorbars to each panel (also on the bottom,
-left, top, or right).
+Internally, this module uses the flexible [`matplotlib` `AxesGrid` toolkit](https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html#axes-grid1),
+which enables making panel plots with precise spacing in physical (rather than
+relative) space.
 
 Another project with a similar motivation is [panel-plots](
 https://github.com/ajdawson/panel-plots); however it does not have support
-for adding colorbars to a dimensionally-constrained figure.  Some of the
-re-write here was inspired by ideas in that project.  In particular, 
-adding user-settable padding to the edges of the figure (to add
-space for axes ticks, ticklabels, and labels) was a really good idea
-implemented in `panel-plots`; it eliminates the need for using
-`bbox_inches='tight'` when saving the figure, and enables the user to make sure
-that their figures are *exactly* the dimensions they need for their use.  Also,
-using `fig.add_axes(rect)` (as is done in `panel-plots`) is a much cleaner way of constructing axes with
-specific sizes and positions than what was implemented here previously.
+for adding colorbars to a dimensionally-constrained figure (it does not use
+`AxesGrid` internally).  One part of the implementation there that inspired
+part of what is done here is the ability to add user-settable padding to the 
+edges of the figure (to add space for axes ticks, ticklabels, and labels). 
+This eliminates the need for using `bbox_inches='tight'` when saving the 
+figure, and enables the user to make sure that their figures are
+*exactly* the dimensions they need for their use.
 
 Examples
 --------
@@ -98,7 +90,7 @@ fig, axes, cax = facets(
     2, 3, width=8., 
     internal_pad=0.2, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=1.,
-    cbar_mode='figure', cbar_long_side_pad=0.1,
+    cbar_mode='single', cbar_pad=0.1,
     cbar_short_side_pad=0.1, cbar_location='right')
     
 x = np.linspace(0., 6. * np.pi)
@@ -139,7 +131,7 @@ fig, axes, caxes = facets(
     2, 3, width=8., 
     internal_pad=0.7, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=0.5,
-    cbar_mode='tile', cbar_long_side_pad=0.1,
+    cbar_mode='each', cbar_pad=0.1,
     cbar_short_side_pad=0.0, cbar_location='right')
 
 x = np.linspace(0., 6. * np.pi)

@@ -1,2 +1,1 @@
-from .facets import (facets, Tile, BasicGrid, ColorbarGrid, MultiColorbarGrid,
-                     WidthConstrainedAxesGrid)
+from .facets import facets, WidthConstrainedAxesGrid
