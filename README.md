@@ -10,24 +10,18 @@ between-plot spacing, and colorbar dimensions.
 Description
 -----------
 
-This is a module that I use in practice
-to produce both single and multi-panel figures for presentations and
-manuscripts. The reason I have gone through the trouble to write something
-like this is that I am particular about a few things:
-
-- I want tight, but easy, control over the space in between the panels of my
-  figures in real space (not relative space).
-- I want tight control over the aspect ratio of the panels of my figure (e.g.
-  when plotting maps), but still work within a strict dimensional constraint
-  over the entire figure (e.g. I want to make a figure to fit in a column of a
-  manuscript).
-- I want to make sure that the colorbars in all
-  of my figures have the same thickness throughout my presentations or
-  manuscripts.
+The purpose of this module is to make it easy to produce single-or-multi-panel
+figures in `matplotlib` with strict dimensional constraints.  For example,
+perhaps you would like to make a figure that fits exactly within a column of a
+manuscript *without any scaling*, and you would like the panels to be as large
+as possible, but retain a fixed aspect ratio (height divided by width).  Maybe
+some (or all) of your panels require an accompanying colorbar.  With
+out of the box `matplotlib` tools this is actually somewhat tricky.
 
 Internally, this module uses the flexible [`matplotlib` `AxesGrid` toolkit](https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html#axes-grid1),
-which enables making panel plots with precise spacing in physical (rather than
-relative) space.
+with some additional logic to enable making these kinds of
+dimensionally-constrained
+panel plots with precise padding and colorbar size(s).
 
 Another project with a similar motivation is [panel-plots](
 https://github.com/ajdawson/panel-plots); however it does not have support
@@ -35,9 +29,8 @@ for adding colorbars to a dimensionally-constrained figure.  One part of the
 implementation there that inspired part of what is done here is the ability 
 to add user-settable padding to the edges of the figure (to add space for 
 axes ticks, ticklabels, and labels).  This eliminates the need for using 
-`bbox_inches='tight'` when saving the figure, and enables the user 
-to make sure that their figures are *exactly* the dimensions 
-they need for their use.
+`bbox_inches='tight'` when saving the figure, and enables you 
+to make sure that your figures are *exactly* the dimensions you need for your use.
 
 Examples
 --------
@@ -69,7 +62,7 @@ fig.savefig('basic-grid-example.png')
 ![basic-grid-example.png](facets/examples/basic-grid-example.png?raw=true)
 
 This is a multi-panel plot with a common colorbar.  Note that
-despite [matplotlib#9778](https://github.com/matplotlib/matplotlib/issues/9778)
+despite [matplotlib/matplotlib#9778](https://github.com/matplotlib/matplotlib/issues/9778)
 we can draw a colorbar in the standard way with `extend='both'` specified in
 the filled contour plot.  This is because we replace the colorbar axes
 generated in `AxesGrid` (which are of type
