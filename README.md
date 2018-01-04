@@ -62,25 +62,21 @@ for ax in axes:
     ax.plot(x, y)
     ax.set_yticks(np.arange(-1., 1.2, 0.5))
     ax.set_xticks(np.arange(0., 18.1, 3.))
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    
-axes[0].set_yticklabels(np.arange(-1., 1.2, 0.5))
-axes[3].set_yticklabels(np.arange(-1., 1.2, 0.5))
-
-axes[3].set_xticklabels(np.arange(0., 18.1, 3.))
-axes[4].set_xticklabels(np.arange(0., 18.1, 3.))
-axes[5].set_xticklabels(np.arange(0., 18.1, 3.))
 
 fig.savefig('basic-grid-example.png')
 ```
 
 ![basic-grid-example.png](facets/examples/basic-grid-example.png?raw=true)
 
-This is a multi-panel plot with a common colorbar:
+This is a multi-panel plot with a common colorbar.  Note that
+despite [matplotlib#9778](https://github.com/matplotlib/matplotlib/issues/9778)
+we can draw a colorbar in the standard way with `extend='both'` specified in
+the filled contour plot.  This is because we replace the colorbar axes
+generated in `AxesGrid` (which are of type
+`mpl_toolkits.axes_grid1.axes_grid.CbarAxes`) with standard `matplotlib` axes
+objects (of type `matplotlib.axes._axes.Axes`).
 ```python
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import numpy as np
 
 from facets import facets
@@ -100,23 +96,11 @@ z = np.sin(xg) * np.cos(yg)
 levels = np.arange(-1., 1.05, 0.1)
 
 for ax in axes:
-    ax.contourf(x, y, z, levels=levels, cmap='RdBu_r')
+    c = ax.contourf(x, y, z, levels=levels, cmap='RdBu_r', extend='both')
     ax.set_yticks(np.arange(0., 18.1, 6.))
     ax.set_xticks(np.arange(0., 18.1, 6.))
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    
-axes[0].set_yticklabels(np.arange(0., 18.1, 6.))
-axes[3].set_yticklabels(np.arange(0., 18.1, 6.))
 
-axes[3].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[4].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[5].set_xticklabels(np.arange(0., 18.1, 6.))
-
-cbar = mpl.colorbar.ColorbarBase(cax, cmap=cmap,
-                                 boundaries=levels,
-                                 orientation='vertical')
-cbar.set_label('Example')
+plt.colorbar(c, cax=cax, orientation='vertical', label='Example')
 
 fig.savefig('colorbar-grid-example.png')
 ```
@@ -126,6 +110,11 @@ fig.savefig('colorbar-grid-example.png')
 Finally, this is an example of a multi-panel plot with colorbars attached to
 every panel:
 ```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+from facets import facets
+
 
 fig, axes, caxes = facets(
     2, 3, width=8., 
@@ -140,27 +129,12 @@ xg, yg = np.meshgrid(x, y)
 z = np.sin(xg) * np.cos(yg)
 levels = np.arange(-1., 1.05, 0.1)
 
-for ax in axes:
-    ax.contourf(x, y, z, levels=levels, cmap='RdBu_r')
+for ax, cax in zip(axes, caxes):
+    c = ax.contourf(x, y, z, levels=levels, cmap='RdBu_r')
     ax.set_yticks(np.arange(0., 18.1, 6.))
     ax.set_xticks(np.arange(0., 18.1, 6.))
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    
-axes[0].set_yticklabels(np.arange(0., 18.1, 6.))
-axes[3].set_yticklabels(np.arange(0., 18.1, 6.))
-
-axes[3].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[4].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[5].set_xticklabels(np.arange(0., 18.1, 6.))
-
-for cax in caxes:
-    cmap = mpl.cm.RdBu_r
-    cbar = mpl.colorbar.ColorbarBase(cax, cmap=cmap,
-                                     boundaries=levels,
-                                     orientation='vertical')
-    cbar.set_label('Example')
-    cbar.set_ticks(np.arange(-1., 1.01, 0.5))
+    plt.colorbar(c, cax, label='Example', orientation='vertical',
+                 ticks=np.arange(-1., 1.01, 0.5))
 
 fig.savefig('multi-colorbar-grid-example.png')
 ```
