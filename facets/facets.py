@@ -6,7 +6,7 @@ from mpl_toolkits.axes_grid1 import AxesGrid
 def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
            bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
            cbar_mode=None, cbar_short_side_pad=0.5, cbar_pad=0.5,
-           cbar_size=0.125, cbar_location='right', axes_kwargs={}):
+           cbar_size=0.125, cbar_location='right'):
     """Create figure and tiled axes objects with precise attributes
 
     Parameters
@@ -29,7 +29,7 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Spacing (in inches) between right of figure and axes
     internal_pad : float
         Spacing in between tiles (in inches)
-    cbar_mode : {None, 'figure', 'tile'}
+    cbar_mode : {None, 'single', 'each'}
         Mode for adding colorbar(s) to figure
     cbar_short_side_pad : float
         Spacing between the ends of the colorbar and the edges
@@ -41,9 +41,6 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Width of the colorbar in inches
     cbar_location : {'top', 'bottom', 'left', 'right'}
         Side of the plot axes (or figure) for the colorbar
-    axes_kwargs : dict
-        Keyword arguments to pass to ``fig.add_axes()`` when creating
-        the plot axes for each tile (e.g. for specifying a Cartopy projection).
 
     Returns
     -------
@@ -133,10 +130,12 @@ class WidthConstrainedAxesGrid(object):
 
     @property
     def plot_height(self):
+        """Height of plot area in panel (in inches)"""
         return self.plot_width * self.aspect
 
     @property
     def height(self):
+        """Height of the complete figure in inches"""
         _, vpad = self.axes_pad
         total_plot_height = self.rows * self.plot_height
         total_axes_pad = (self.rows - 1) * vpad
