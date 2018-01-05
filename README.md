@@ -10,42 +10,27 @@ between-plot spacing, and colorbar dimensions.
 Description
 -----------
 
-This is a module that I use in practice
-to produce both single and multi-panel figures for presentations and
-manuscripts. The reason I have gone through the trouble to write something
-like this is that I am particular about a few things:
+The purpose of this module is to make it easy to produce single-or-multi-panel
+figures in `matplotlib` with strict dimensional constraints.  For example,
+perhaps you would like to make a figure that fits exactly within a column of a
+manuscript *without any scaling*, and you would like the panels to be as large
+as possible, but retain a fixed aspect ratio (height divided by width).  Maybe
+some (or all) of your panels require an accompanying colorbar.  With
+out of the box `matplotlib` tools this is actually somewhat tricky.
 
-- I want tight, but easy, control over the space in between the panels of my
-  figures in real space (not relative space).
-- I want tight control over the aspect ratio of the panels of my figure (e.g.
-  when plotting maps), but still work within a strict dimensional constraint
-  over the entire figure (e.g. I want to make a figure to fit in a column of a
-  manuscript).
-- I want to make sure that the colorbars in all
-  of my figures have the same thickness throughout my presentations or
-  manuscripts; unfortunately it is hard to control this using the default 
-  `matplotlib` tools (you can set the thickness in relative space, but you 
-  need to be careful about what that means within the context of your 
-  figure size).
-
-I have recently re-written the entire module to make it easier to add different
-layouts.  Previously, the only two layouts enabled were a basic grid layout
-with no colorbar, and a grid layout with a common colorbar at the bottom of the
-figure.  Now one could add a common colorbar to the bottom, left, top, or right
-of the figure, or one can add colorbars to each panel (also on the bottom,
-left, top, or right).
+Internally, this module uses the flexible [`matplotlib` `AxesGrid` toolkit](https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html#axes-grid1),
+with some additional logic to enable making these kinds of
+dimensionally-constrained
+panel plots with precise padding and colorbar size(s).
 
 Another project with a similar motivation is [panel-plots](
 https://github.com/ajdawson/panel-plots); however it does not have support
-for adding colorbars to a dimensionally-constrained figure.  Some of the
-re-write here was inspired by ideas in that project.  In particular, 
-adding user-settable padding to the edges of the figure (to add
-space for axes ticks, ticklabels, and labels) was a really good idea
-implemented in `panel-plots`; it eliminates the need for using
-`bbox_inches='tight'` when saving the figure, and enables the user to make sure
-that their figures are *exactly* the dimensions they need for their use.  Also,
-using `fig.add_axes(rect)` (as is done in `panel-plots`) is a much cleaner way of constructing axes with
-specific sizes and positions than what was implemented here previously.
+for adding colorbars to a dimensionally-constrained figure.  One part of the 
+implementation there that inspired part of what is done here is the ability 
+to add user-settable padding to the edges of the figure (to add space for 
+axes ticks, ticklabels, and labels).  This eliminates the need for using 
+`bbox_inches='tight'` when saving the figure, and enables you 
+to make sure that your figures are *exactly* the dimensions you need for your use.
 
 Examples
 --------
@@ -70,25 +55,21 @@ for ax in axes:
     ax.plot(x, y)
     ax.set_yticks(np.arange(-1., 1.2, 0.5))
     ax.set_xticks(np.arange(0., 18.1, 3.))
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    
-axes[0].set_yticklabels(np.arange(-1., 1.2, 0.5))
-axes[3].set_yticklabels(np.arange(-1., 1.2, 0.5))
-
-axes[3].set_xticklabels(np.arange(0., 18.1, 3.))
-axes[4].set_xticklabels(np.arange(0., 18.1, 3.))
-axes[5].set_xticklabels(np.arange(0., 18.1, 3.))
 
 fig.savefig('basic-grid-example.png')
 ```
 
 ![basic-grid-example.png](facets/examples/basic-grid-example.png?raw=true)
 
-This is a multi-panel plot with a common colorbar:
+This is a multi-panel plot with a common colorbar.  Note that
+despite [matplotlib/matplotlib#9778](https://github.com/matplotlib/matplotlib/issues/9778)
+we can draw a colorbar in the standard way with `extend='both'` specified in
+the filled contour plot.  This is because we replace the colorbar axes
+generated in `AxesGrid` (which are of type
+`mpl_toolkits.axes_grid1.axes_grid.CbarAxes`) with standard `matplotlib` axes
+objects (of type `matplotlib.axes._axes.Axes`).
 ```python
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import numpy as np
 
 from facets import facets
@@ -98,7 +79,7 @@ fig, axes, cax = facets(
     2, 3, width=8., 
     internal_pad=0.2, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=1.,
-    cbar_mode='figure', cbar_long_side_pad=0.1,
+    cbar_mode='single', cbar_pad=0.1,
     cbar_short_side_pad=0.1, cbar_location='right')
     
 x = np.linspace(0., 6. * np.pi)
@@ -108,23 +89,11 @@ z = np.sin(xg) * np.cos(yg)
 levels = np.arange(-1., 1.05, 0.1)
 
 for ax in axes:
-    ax.contourf(x, y, z, levels=levels, cmap='RdBu_r')
+    c = ax.contourf(x, y, z, levels=levels, cmap='RdBu_r', extend='both')
     ax.set_yticks(np.arange(0., 18.1, 6.))
     ax.set_xticks(np.arange(0., 18.1, 6.))
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    
-axes[0].set_yticklabels(np.arange(0., 18.1, 6.))
-axes[3].set_yticklabels(np.arange(0., 18.1, 6.))
 
-axes[3].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[4].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[5].set_xticklabels(np.arange(0., 18.1, 6.))
-
-cbar = mpl.colorbar.ColorbarBase(cax, cmap=cmap,
-                                 boundaries=levels,
-                                 orientation='vertical')
-cbar.set_label('Example')
+plt.colorbar(c, cax=cax, orientation='vertical', label='Example')
 
 fig.savefig('colorbar-grid-example.png')
 ```
@@ -134,12 +103,17 @@ fig.savefig('colorbar-grid-example.png')
 Finally, this is an example of a multi-panel plot with colorbars attached to
 every panel:
 ```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+from facets import facets
+
 
 fig, axes, caxes = facets(
     2, 3, width=8., 
     internal_pad=0.7, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=0.5,
-    cbar_mode='tile', cbar_long_side_pad=0.1,
+    cbar_mode='each', cbar_pad=0.1,
     cbar_short_side_pad=0.0, cbar_location='right')
 
 x = np.linspace(0., 6. * np.pi)
@@ -148,27 +122,12 @@ xg, yg = np.meshgrid(x, y)
 z = np.sin(xg) * np.cos(yg)
 levels = np.arange(-1., 1.05, 0.1)
 
-for ax in axes:
-    ax.contourf(x, y, z, levels=levels, cmap='RdBu_r')
+for ax, cax in zip(axes, caxes):
+    c = ax.contourf(x, y, z, levels=levels, cmap='RdBu_r')
     ax.set_yticks(np.arange(0., 18.1, 6.))
     ax.set_xticks(np.arange(0., 18.1, 6.))
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    
-axes[0].set_yticklabels(np.arange(0., 18.1, 6.))
-axes[3].set_yticklabels(np.arange(0., 18.1, 6.))
-
-axes[3].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[4].set_xticklabels(np.arange(0., 18.1, 6.))
-axes[5].set_xticklabels(np.arange(0., 18.1, 6.))
-
-for cax in caxes:
-    cmap = mpl.cm.RdBu_r
-    cbar = mpl.colorbar.ColorbarBase(cax, cmap=cmap,
-                                     boundaries=levels,
-                                     orientation='vertical')
-    cbar.set_label('Example')
-    cbar.set_ticks(np.arange(-1., 1.01, 0.5))
+    plt.colorbar(c, cax, label='Example', orientation='vertical',
+                 ticks=np.arange(-1., 1.01, 0.5))
 
 fig.savefig('multi-colorbar-grid-example.png')
 ```
