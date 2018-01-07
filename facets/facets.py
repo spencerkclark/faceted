@@ -1,12 +1,15 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
+from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
 def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
            bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
            cbar_mode=None, cbar_short_side_pad=0.5, cbar_pad=0.5,
-           cbar_size=0.125, cbar_location='right'):
+           cbar_size=0.125, cbar_location='right', sharex=False, sharey=False,
+           axes_kwargs={}):
     """Create figure and tiled axes objects with precise attributes
 
     Parameters
@@ -41,6 +44,12 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Width of the colorbar in inches
     cbar_location : {'top', 'bottom', 'left', 'right'}
         Side of the plot axes (or figure) for the colorbar
+    sharex : bool
+        Share x-axis limits, ticks, and tick labels
+    sharey : bool
+        Share y-axis limits, ticks, and tick labels
+    axes_kwargs : dict
+        Keyword arguments to pass to Axes constructor
 
     Returns
     -------
@@ -51,7 +60,8 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         bottom_pad=bottom_pad, left_pad=left_pad, right_pad=right_pad,
         cbar_mode=cbar_mode, cbar_location=cbar_location, cbar_pad=cbar_pad,
         cbar_size=cbar_size, cbar_short_side_pad=cbar_short_side_pad,
-        axes_pad=internal_pad
+        axes_pad=internal_pad, sharex=sharex, sharey=sharey,
+        axes_kwargs=axes_kwargs
     )
     if cbar_mode is None:
         return grid.fig, grid.axes
@@ -70,7 +80,8 @@ class WidthConstrainedAxesGrid(object):
     def __init__(self, rows, cols, width, top_pad=0., bottom_pad=0.,
                  left_pad=0., right_pad=0., cbar_size=0.125,
                  cbar_pad=0.125, axes_pad=0.2, cbar_mode=None,
-                 cbar_location='bottom', aspect=0.5, cbar_short_side_pad=0.):
+                 cbar_location='bottom', aspect=0.5, cbar_short_side_pad=0.,
+                 sharex=False, sharey=False, axes_kwargs={}):
         self.rows = rows
         self.cols = cols
         self.width = width
@@ -100,11 +111,12 @@ class WidthConstrainedAxesGrid(object):
         self.cbar_short_side_pad = cbar_short_side_pad
 
         self.fig = plt.figure()
-        self.grid = AxesGrid(
+        self.grid = ModernAxesGrid(
             self.fig, self.rect(), nrows_ncols=(self.rows, self.cols),
             cbar_size=self.cbar_size, cbar_pad=self.cbar_pad,
             axes_pad=self.axes_pad, cbar_mode=self.cbar_mode,
-            cbar_location=self.cbar_location, aspect=False
+            cbar_location=self.cbar_location, aspect=False, sharex=sharex,
+            sharey=sharey, axes_kwargs=axes_kwargs
         )
         self.fig.set_size_inches(self.width, self.height)
         self.axes = self.grid.axes_all
@@ -192,3 +204,82 @@ class WidthConstrainedAxesGrid(object):
             height = (position.height -
                       2. * self.cbar_short_side_pad / self.height)
             return [x0, y0, width, height]
+
+
+class ModernCbarAxes(Axes):
+    def __init__(self, *args, **kwargs):
+        if 'orientation' in kwargs:
+            del kwargs['orientation']
+        super(ModernCbarAxes, self).__init__(*args, **kwargs)
+
+
+class ModernAxesGrid(AxesGrid):
+    def __init__(self, fig, rect, nrows_ncols, ngrids=None, direction='row',
+                 axes_pad=0.02, add_all=True, sharex=False, sharey=False,
+                 aspect=True, cbar_mode=None, cbar_location='right',
+                 cbar_pad=None, cbar_size=0.125,
+                 axes_kwargs={}):
+        self._defaultCbarAxesClass = ModernCbarAxes
+        super(ModernAxesGrid, self).__init__(
+            fig, rect, nrows_ncols, ngrids=ngrids, direction=direction,
+            axes_pad=axes_pad, add_all=add_all, share_all=False, aspect=aspect,
+            cbar_mode=cbar_mode, cbar_location=cbar_location,
+            cbar_pad=cbar_pad, cbar_size=cbar_size, label_mode=None,
+            axes_class=(Axes, axes_kwargs))
+        self.nrows_ncols = nrows_ncols
+        if isinstance(sharex, bool):
+            sharex = 'all' if sharex else 'none'
+        if isinstance(sharey, bool):
+            sharey = 'all' if sharey else 'none'
+        self.sharex(sharex)
+        self.sharey(sharey)
+
+    @staticmethod
+    def _sharex(axes):
+        ax_ref = axes[0]
+        for ax in axes:
+            ax.xaxis.major = ax_ref.xaxis.major
+            ax.xaxis.minor = ax_ref.xaxis.minor
+            ax.get_shared_x_axes().join(ax_ref, ax)
+
+    @staticmethod
+    def _sharey(axes):
+        ax_ref = axes[0]
+        for ax in axes:
+            ax.yaxis.major = ax_ref.yaxis.major
+            ax.yaxis.minor = ax_ref.yaxis.minor
+            ax.get_shared_y_axes().join(ax_ref, ax)
+
+    def sharex(self, sharex):
+        axes = np.reshape(self.axes_all, self.nrows_ncols)
+        if sharex == 'col':
+            for col in axes.T:
+                self._sharex(col)
+        elif sharex == 'row':
+            for row in axes:
+                self._sharex(row)
+        elif sharex == 'all':
+            self._sharex(axes.flatten())
+
+        if sharex in ['col', 'all']:
+            for ax in axes[:-1, :].flatten():
+                ax.xaxis.set_tick_params(which='both', labelbottom=False,
+                                         labeltop=False)
+                ax.xaxis.offsetText.set_visible(False)
+
+    def sharey(self, sharey):
+        axes = np.reshape(self.axes_all, self.nrows_ncols)
+        if sharey == 'col':
+            for col in axes.T:
+                self._sharey(col)
+        elif sharey == 'row':
+            for row in axes:
+                self._sharey(row)
+        elif sharey == 'all':
+            self._sharey(axes.flatten())
+
+        if sharey in ['row', 'all']:
+            for ax in axes[:, 1:].flatten():
+                ax.yaxis.set_tick_params(which='both', labelbottom=False,
+                                         labeltop=False)
+                ax.yaxis.offsetText.set_visible(False)
