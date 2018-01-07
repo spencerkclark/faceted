@@ -1,7 +1,8 @@
+from itertools import product
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
@@ -73,7 +74,102 @@ _LR = ['left', 'right']
 _BT = ['bottom', 'top']
 
 
-class WidthConstrainedAxesGrid(object):
+class CbarShortSidePadMixin(object):
+    def resize_colorbar(self, cax):
+        """Add a short-side pad to a given AxesGrid colorbar"""
+        locator = cax.get_axes_locator()
+        position = locator(cax, None)
+        cax.set_visible(False)  # Maybe we should delete it completely?
+        new_position = self.cax_position(position)
+        return self.fig.add_axes(new_position)
+
+    def resize_colorbars(self):
+        """Depending on the cbar_mode resize colorbar(s) to accomodate
+        short-side pad option"""
+        if self.cbar_mode == 'each':
+            return [self.resize_colorbar(cax) for cax in self.grid.cbar_axes]
+        elif self.cbar_mode == 'single':
+            return self.resize_colorbar(self.grid.cbar_axes[0])
+        else:
+            return None
+
+    def cax_position(self, position):
+        """Compute a new colorbar position from an old one"""
+        if self.cbar_location in _BT:
+            x0 = position.x0 + self.cbar_short_side_pad / self.width
+            y0 = position.y0
+            width = position.width - 2. * self.cbar_short_side_pad / self.width
+            height = position.height
+            return [x0, y0, width, height]
+        elif self.cbar_location in _LR:
+            x0 = position.x0
+            y0 = position.y0 + self.cbar_short_side_pad / self.height
+            width = position.width
+            height = (position.height -
+                      2. * self.cbar_short_side_pad / self.height)
+            return [x0, y0, width, height]
+
+
+class ShareAxesMixin(object):
+    def redraw_ax(self, ax, sharex=None, sharey=None, axes_kwargs={}):
+        locator = ax.get_axes_locator()
+        position = locator(ax, None)
+        ax.set_visible(False)
+        return self.fig.add_axes(position, sharex=sharex, sharey=sharey,
+                                 **axes_kwargs)
+
+    def redraw_axes(self):
+        col_ref_axes = [None] * self.cols
+        row_ref_axes = [None] * self.rows
+        all_ref = None
+
+        axes = []
+        rows_cols = product(range(self.rows), range(self.cols))
+        for ax, (row, col) in zip(self.grid.axes_all, rows_cols):
+            if self.sharex == 'all':
+                sharex = all_ref
+                print(sharex)
+            elif self.sharex == 'col':
+                sharex = col_ref_axes[col]
+            elif self.sharex == 'row':
+                sharex = row_ref_axes[row]
+            else:
+                sharex = None
+
+            if self.sharey == 'all':
+                sharey = all_ref
+            elif self.sharey == 'col':
+                sharey = col_ref_axes[col]
+            elif self.sharey == 'row':
+                sharey = row_ref_axes[row]
+            else:
+                sharey = None
+
+            new = self.redraw_ax(ax, sharex=sharex, sharey=sharey,
+                                 axes_kwargs=self.axes_kwargs)
+            axes.append(new)
+            all_ref = new
+            col_ref_axes[col] = new
+            row_ref_axes[row] = new
+
+        return axes
+
+    def set_ticklabel_visibility(self):
+        axes = np.reshape(self.axes, (self.rows, self.cols))
+        if self.sharex in ['col', 'all']:
+            for ax in axes[:-1, :].flatten():
+                ax.xaxis.set_tick_params(which='both', labelbottom=False,
+                                         labeltop=False)
+                ax.xaxis.offsetText.set_visible(False)
+
+        if self.sharey in ['row', 'all']:
+            for ax in axes[:, 1:].flatten():
+                ax.yaxis.set_tick_params(which='both', labelbottom=False,
+                                         labeltop=False)
+                ax.yaxis.offsetText.set_visible(False)
+
+
+class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
     """An AxesGrid object with a figure constrained to a precise width
     with panels with a prescribed aspect ratio.
     """
@@ -100,6 +196,10 @@ class WidthConstrainedAxesGrid(object):
         self.cbar_pad = cbar_pad
         self.cbar_location = cbar_location
 
+        self.sharex = sharex
+        self.sharey = sharey
+        self.axes_kwargs = axes_kwargs
+
         # For some reason when the colorbar is placed at the bottom or left
         # and the colorbar mode is 'single', AxesGrid adds an extra
         # axes pad to the colorbar padding; we correct this manually here.
@@ -111,15 +211,15 @@ class WidthConstrainedAxesGrid(object):
         self.cbar_short_side_pad = cbar_short_side_pad
 
         self.fig = plt.figure()
-        self.grid = ModernAxesGrid(
+        self.grid = AxesGrid(
             self.fig, self.rect(), nrows_ncols=(self.rows, self.cols),
             cbar_size=self.cbar_size, cbar_pad=self.cbar_pad,
             axes_pad=self.axes_pad, cbar_mode=self.cbar_mode,
-            cbar_location=self.cbar_location, aspect=False, sharex=sharex,
-            sharey=sharey, axes_kwargs=axes_kwargs
+            cbar_location=self.cbar_location, aspect=False
         )
         self.fig.set_size_inches(self.width, self.height)
-        self.axes = self.grid.axes_all
+        self.axes = self.redraw_axes()
+        self.set_ticklabel_visibility()
         self.caxes = self.resize_colorbars()
 
     @property
@@ -170,116 +270,3 @@ class WidthConstrainedAxesGrid(object):
         width = (self.width - self.left_pad - self.right_pad) / self.width
         height = (self.height - self.top_pad - self.bottom_pad) / self.height
         return [x0, y0, width, height]
-
-    def resize_colorbar(self, cax):
-        """Add a short-side pad to a given AxesGrid colorbar"""
-        locator = cax.get_axes_locator()
-        position = locator(cax, None)
-        cax.set_visible(False)  # Maybe we should delete it completely?
-        new_position = self.cax_position(position)
-        return self.fig.add_axes(new_position)
-
-    def resize_colorbars(self):
-        """Depending on the cbar_mode resize colorbar(s) to accomodate
-        short-side pad option"""
-        if self.cbar_mode == 'each':
-            return [self.resize_colorbar(cax) for cax in self.grid.cbar_axes]
-        elif self.cbar_mode == 'single':
-            return self.resize_colorbar(self.grid.cbar_axes[0])
-        else:
-            return None
-
-    def cax_position(self, position):
-        """Compute a new colorbar position from an old one"""
-        if self.cbar_location in _BT:
-            x0 = position.x0 + self.cbar_short_side_pad / self.width
-            y0 = position.y0
-            width = position.width - 2. * self.cbar_short_side_pad / self.width
-            height = position.height
-            return [x0, y0, width, height]
-        elif self.cbar_location in _LR:
-            x0 = position.x0
-            y0 = position.y0 + self.cbar_short_side_pad / self.height
-            width = position.width
-            height = (position.height -
-                      2. * self.cbar_short_side_pad / self.height)
-            return [x0, y0, width, height]
-
-
-class ModernCbarAxes(Axes):
-    def __init__(self, *args, **kwargs):
-        if 'orientation' in kwargs:
-            del kwargs['orientation']
-        super(ModernCbarAxes, self).__init__(*args, **kwargs)
-
-
-class ModernAxesGrid(AxesGrid):
-    def __init__(self, fig, rect, nrows_ncols, ngrids=None, direction='row',
-                 axes_pad=0.02, add_all=True, sharex=False, sharey=False,
-                 aspect=True, cbar_mode=None, cbar_location='right',
-                 cbar_pad=None, cbar_size=0.125,
-                 axes_kwargs={}):
-        self._defaultCbarAxesClass = ModernCbarAxes
-        super(ModernAxesGrid, self).__init__(
-            fig, rect, nrows_ncols, ngrids=ngrids, direction=direction,
-            axes_pad=axes_pad, add_all=add_all, share_all=False, aspect=aspect,
-            cbar_mode=cbar_mode, cbar_location=cbar_location,
-            cbar_pad=cbar_pad, cbar_size=cbar_size, label_mode=None,
-            axes_class=(Axes, axes_kwargs))
-        self.nrows_ncols = nrows_ncols
-        if isinstance(sharex, bool):
-            sharex = 'all' if sharex else 'none'
-        if isinstance(sharey, bool):
-            sharey = 'all' if sharey else 'none'
-        self.sharex(sharex)
-        self.sharey(sharey)
-
-    @staticmethod
-    def _sharex(axes):
-        ax_ref = axes[0]
-        for ax in axes:
-            ax.xaxis.major = ax_ref.xaxis.major
-            ax.xaxis.minor = ax_ref.xaxis.minor
-            ax.get_shared_x_axes().join(ax_ref, ax)
-
-    @staticmethod
-    def _sharey(axes):
-        ax_ref = axes[0]
-        for ax in axes:
-            ax.yaxis.major = ax_ref.yaxis.major
-            ax.yaxis.minor = ax_ref.yaxis.minor
-            ax.get_shared_y_axes().join(ax_ref, ax)
-
-    def sharex(self, sharex):
-        axes = np.reshape(self.axes_all, self.nrows_ncols)
-        if sharex == 'col':
-            for col in axes.T:
-                self._sharex(col)
-        elif sharex == 'row':
-            for row in axes:
-                self._sharex(row)
-        elif sharex == 'all':
-            self._sharex(axes.flatten())
-
-        if sharex in ['col', 'all']:
-            for ax in axes[:-1, :].flatten():
-                ax.xaxis.set_tick_params(which='both', labelbottom=False,
-                                         labeltop=False)
-                ax.xaxis.offsetText.set_visible(False)
-
-    def sharey(self, sharey):
-        axes = np.reshape(self.axes_all, self.nrows_ncols)
-        if sharey == 'col':
-            for col in axes.T:
-                self._sharey(col)
-        elif sharey == 'row':
-            for row in axes:
-                self._sharey(row)
-        elif sharey == 'all':
-            self._sharey(axes.flatten())
-
-        if sharey in ['row', 'all']:
-            for ax in axes[:, 1:].flatten():
-                ax.yaxis.set_tick_params(which='both', labelbottom=False,
-                                         labeltop=False)
-                ax.yaxis.offsetText.set_visible(False)
