@@ -290,3 +290,92 @@ def check_width_constrained_caxes_positions_each(grid):
             dy = (tile_height - 2. * _SHORT_SIDE_PAD) / height
             expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(cax_bounds, expected_bounds)
+
+
+def shared_grid(sharex, sharey):
+    return WidthConstrainedAxesGrid(
+        2, 2, _WIDTH_CONSTRAINT, sharex=sharex, sharey=sharey,
+        cbar_mode='single')
+
+
+def assert_valid_x_sharing(shared_grid, sharex):
+    axes = np.reshape(shared_grid.axes, (shared_grid.rows, shared_grid.cols))
+    if sharex == 'all':
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten():
+            assert ax.xaxis.major == ax_ref.xaxis.major
+            assert ax.xaxis.minor == ax_ref.xaxis.minor
+    elif sharex == 'row':
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row:
+                assert ax.xaxis.major == ax_ref.xaxis.major
+                assert ax.xaxis.minor == ax_ref.xaxis.minor
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col[1:]:
+                assert ax.xaxis.major != ax_ref.xaxis.major
+                assert ax.xaxis.minor != ax_ref.xaxis.minor
+    elif sharex == 'col':
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col:
+                assert ax.xaxis.major == ax_ref.xaxis.major
+                assert ax.xaxis.minor == ax_ref.xaxis.minor
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row[1:]:
+                assert ax.xaxis.major != ax_ref.xaxis.major
+                assert ax.xaxis.minor != ax_ref.xaxis.minor
+    elif sharex == 'none':
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten()[1:]:
+            assert ax.xaxis.major != ax_ref.xaxis.major
+            assert ax.xaxis.minor != ax_ref.xaxis.minor        
+
+
+def assert_valid_y_sharing(shared_grid, sharey):
+    axes = np.reshape(shared_grid.axes, (shared_grid.rows, shared_grid.cols))
+    if sharey == 'all':
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten():
+            assert ax.yaxis.major == ax_ref.yaxis.major
+            assert ax.yaxis.minor == ax_ref.yaxis.minor
+    elif sharey == 'row':
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row:
+                assert ax.yaxis.major == ax_ref.yaxis.major
+                assert ax.yaxis.minor == ax_ref.yaxis.minor
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col[1:]:
+                assert ax.yaxis.major != ax_ref.yaxis.major
+                assert ax.yaxis.minor != ax_ref.yaxis.minor
+    elif sharey == 'col':
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col:
+                assert ax.yaxis.major == ax_ref.yaxis.major
+                assert ax.yaxis.minor == ax_ref.yaxis.minor
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row[1:]:
+                assert ax.yaxis.major != ax_ref.yaxis.major
+                assert ax.yaxis.minor != ax_ref.yaxis.minor
+    elif sharey == 'none':
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten()[1:]:
+            assert ax.yaxis.major != ax_ref.yaxis.major
+            assert ax.yaxis.minor != ax_ref.yaxis.minor
+
+
+_SHARE_OPTIONS = ['all', 'row', 'col', 'none']
+
+
+@pytest.mark.parametrize(
+    ('sharex', 'sharey'), product(_SHARE_OPTIONS, _SHARE_OPTIONS))
+def test_share_axes_mixin(sharex, sharey):
+    grid = shared_grid(sharex, sharey)
+    assert_valid_x_sharing(grid, sharex)
+    assert_valid_y_sharing(grid, sharey)

@@ -160,13 +160,11 @@ class ShareAxesMixin(object):
             for ax in axes[:-1, :].flatten():
                 ax.xaxis.set_tick_params(which='both', labelbottom=False,
                                          labeltop=False)
-                ax.xaxis.offsetText.set_visible(False)
 
         if self.sharey in ['row', 'all']:
             for ax in axes[:, 1:].flatten():
                 ax.yaxis.set_tick_params(which='both', labelbottom=False,
                                          labeltop=False)
-                ax.yaxis.offsetText.set_visible(False)
 
 
 class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
