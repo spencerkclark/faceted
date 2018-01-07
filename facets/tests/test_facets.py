@@ -76,12 +76,6 @@ def grid(request):
     plt.close(obj.fig)
 
 
-def get_position(ax):
-    locator = ax.get_axes_locator()
-    position = locator(ax, None)
-    return position
-
-
 def get_tile_width(grid, left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD):
     return (grid.width - left_pad - right_pad
             - (grid.cols - 1) * _INTERNAL_PAD) / grid.cols
