@@ -128,7 +128,6 @@ class ShareAxesMixin(object):
         for ax, (row, col) in zip(self.grid.axes_all, rows_cols):
             if self.sharex == 'all':
                 sharex = all_ref
-                print(sharex)
             elif self.sharex == 'col':
                 sharex = col_ref_axes[col]
             elif self.sharex == 'row':
