@@ -75,6 +75,8 @@ _BT = ['bottom', 'top']
 
 
 class CbarShortSidePadMixin(object):
+    """Methods to redraw colorbar Axes created in AxesGrid, allowing for 
+    customization of their length."""
     def resize_colorbar(self, cax):
         """Add a short-side pad to a given AxesGrid colorbar"""
         locator = cax.get_axes_locator()
@@ -111,8 +113,15 @@ class CbarShortSidePadMixin(object):
 
 
 class ShareAxesMixin(object):
+    """Methods for redrawing axes created by an AxesGrid object
+
+    Enables axes sharing in the style of plt.subplots and for the passing of
+    custom keyword arguments to the Axes constructor (e.g. this allows one to
+    pass a cartopy projection).
+    """
     @property
     def sharex(self):
+        """The sharex mode of the object."""
         if isinstance(self._sharex, bool):
             result = 'all' if self._sharex else 'none'
         else:
@@ -121,6 +130,7 @@ class ShareAxesMixin(object):
 
     @property
     def sharey(self):
+        """The sharey mode of the object"""
         if isinstance(self._sharey, bool):
             result = 'all' if self._sharey else 'none'
         else:
@@ -128,6 +138,8 @@ class ShareAxesMixin(object):
         return result
 
     def redraw_ax(self, ax, sharex=None, sharey=None, axes_kwargs={}):
+        """Redraw an Axes object created in AxesGrid with additional sharing
+        and keyword arguments."""
         locator = ax.get_axes_locator()
         position = locator(ax, None)
         ax.set_visible(False)
@@ -135,6 +147,8 @@ class ShareAxesMixin(object):
                                  **axes_kwargs)
 
     def redraw_axes(self):
+        """Redraw all Axes objects created in AxesGrid with appropriate shared
+        axes depending on the sharing modes."""
         col_ref_axes = [None] * self.cols
         row_ref_axes = [None] * self.rows
         all_ref = None
@@ -170,6 +184,7 @@ class ShareAxesMixin(object):
         return axes
 
     def set_ticklabel_visibility(self):
+        """Make inner Axes tick labels of shared Axes invisible."""
         axes = np.reshape(self.axes, (self.rows, self.cols))
         if self.sharex in ['col', 'all']:
             for ax in axes[:-1, :].flatten():
