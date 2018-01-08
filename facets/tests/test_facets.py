@@ -417,6 +417,7 @@ def test_share_axes_mixin(sharex, sharey):
     grid = shared_grid(sharex, sharey)
     assert_valid_x_sharing(grid, sharex)
     assert_valid_y_sharing(grid, sharey)
+    plt.close(grid.fig)
 
 
 def test_cartopy():
@@ -427,3 +428,4 @@ def test_cartopy():
     fig, axes = facets(2, 2, axes_kwargs={'projection': ccrs.PlateCarree()})
     for ax in axes:
         assert isinstance(ax, GeoAxes)
+    plt.close(fig)
