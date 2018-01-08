@@ -45,9 +45,9 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Width of the colorbar in inches
     cbar_location : {'top', 'bottom', 'left', 'right'}
         Side of the plot axes (or figure) for the colorbar
-    sharex : bool
+    sharex : bool or {'all', 'col', 'row', 'none'}
         Share x-axis limits, ticks, and tick labels
-    sharey : bool
+    sharey : bool or {'all', 'col', 'row', 'none'}
         Share y-axis limits, ticks, and tick labels
     axes_kwargs : dict
         Keyword arguments to pass to Axes constructor
@@ -111,6 +111,22 @@ class CbarShortSidePadMixin(object):
 
 
 class ShareAxesMixin(object):
+    @property
+    def sharex(self):
+        if isinstance(self._sharex, bool):
+            result = 'all' if self._sharex else 'none'
+        else:
+            result = self._sharex
+        return result
+
+    @property
+    def sharey(self):
+        if isinstance(self._sharey, bool):
+            result = 'all' if self._sharey else 'none'
+        else:
+            result = self._sharey
+        return result
+
     def redraw_ax(self, ax, sharex=None, sharey=None, axes_kwargs={}):
         locator = ax.get_axes_locator()
         position = locator(ax, None)
@@ -193,8 +209,8 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         self.cbar_pad = cbar_pad
         self.cbar_location = cbar_location
 
-        self.sharex = sharex
-        self.sharey = sharey
+        self._sharex = sharex
+        self._sharey = sharey
         self.axes_kwargs = axes_kwargs
 
         # For some reason when the colorbar is placed at the bottom or left

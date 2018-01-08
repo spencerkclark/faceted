@@ -292,13 +292,37 @@ def shared_grid(sharex, sharey):
         cbar_mode='single')
 
 
+def assert_visible_xticklabels(ax):
+    assert ax.xaxis._get_tick(ax.xaxis.major).label1On
+    assert ax.xaxis._get_tick(ax.xaxis.minor).label1On
+
+
+def assert_invisible_xticklabels(ax):
+    assert not ax.xaxis._get_tick(ax.xaxis.major).label1On
+    assert not ax.xaxis._get_tick(ax.xaxis.minor).label1On
+
+
+def assert_visible_yticklabels(ax):
+    assert ax.yaxis._get_tick(ax.yaxis.major).label1On
+    assert ax.yaxis._get_tick(ax.yaxis.minor).label1On
+
+
+def assert_invisible_yticklabels(ax):
+    assert not ax.yaxis._get_tick(ax.yaxis.major).label1On
+    assert not ax.yaxis._get_tick(ax.yaxis.minor).label1On
+
+
 def assert_valid_x_sharing(shared_grid, sharex):
     axes = np.reshape(shared_grid.axes, (shared_grid.rows, shared_grid.cols))
-    if sharex == 'all':
+    if sharex in ['all', True]:
         ax_ref = axes.flatten()[0]
         for ax in axes.flatten():
             assert ax.xaxis.major == ax_ref.xaxis.major
             assert ax.xaxis.minor == ax_ref.xaxis.minor
+        for ax in axes[:-1, :].flatten():
+            assert_invisible_xticklabels(ax)
+        for ax in axes[-1, :].flatten():
+            assert_visible_xticklabels(ax)
     elif sharex == 'row':
         for row in axes:
             ax_ref = row[0]
@@ -310,6 +334,8 @@ def assert_valid_x_sharing(shared_grid, sharex):
             for ax in col[1:]:
                 assert ax.xaxis.major != ax_ref.xaxis.major
                 assert ax.xaxis.minor != ax_ref.xaxis.minor
+        for ax in axes.flatten():
+            assert_visible_xticklabels(ax)
     elif sharex == 'col':
         for col in axes.T:
             ax_ref = col[0]
@@ -321,20 +347,30 @@ def assert_valid_x_sharing(shared_grid, sharex):
             for ax in row[1:]:
                 assert ax.xaxis.major != ax_ref.xaxis.major
                 assert ax.xaxis.minor != ax_ref.xaxis.minor
-    elif sharex == 'none':
+        for ax in axes[:-1, :].flatten():
+            assert_invisible_xticklabels(ax)
+        for ax in axes[-1, :].flatten():
+            assert_visible_xticklabels(ax)
+    elif sharex in ['none', False]:
         ax_ref = axes.flatten()[0]
         for ax in axes.flatten()[1:]:
             assert ax.xaxis.major != ax_ref.xaxis.major
-            assert ax.xaxis.minor != ax_ref.xaxis.minor        
+            assert ax.xaxis.minor != ax_ref.xaxis.minor
+        for ax in axes.flatten():
+            assert_visible_xticklabels(ax)
 
 
 def assert_valid_y_sharing(shared_grid, sharey):
     axes = np.reshape(shared_grid.axes, (shared_grid.rows, shared_grid.cols))
-    if sharey == 'all':
+    if sharey in ['all', True]:
         ax_ref = axes.flatten()[0]
         for ax in axes.flatten():
             assert ax.yaxis.major == ax_ref.yaxis.major
             assert ax.yaxis.minor == ax_ref.yaxis.minor
+        for ax in axes[:, 1:].flatten():
+            assert_invisible_yticklabels(ax)
+        for ax in axes[:, 0].flatten():
+            assert_visible_yticklabels(ax)
     elif sharey == 'row':
         for row in axes:
             ax_ref = row[0]
@@ -346,6 +382,10 @@ def assert_valid_y_sharing(shared_grid, sharey):
             for ax in col[1:]:
                 assert ax.yaxis.major != ax_ref.yaxis.major
                 assert ax.yaxis.minor != ax_ref.yaxis.minor
+        for ax in axes[:, 1:].flatten():
+            assert_invisible_yticklabels(ax)
+        for ax in axes[:, 0].flatten():
+            assert_visible_yticklabels(ax)
     elif sharey == 'col':
         for col in axes.T:
             ax_ref = col[0]
@@ -357,14 +397,18 @@ def assert_valid_y_sharing(shared_grid, sharey):
             for ax in row[1:]:
                 assert ax.yaxis.major != ax_ref.yaxis.major
                 assert ax.yaxis.minor != ax_ref.yaxis.minor
-    elif sharey == 'none':
+        for ax in axes.flatten():
+            assert_visible_yticklabels(ax)
+    elif sharey in ['none', False]:
         ax_ref = axes.flatten()[0]
         for ax in axes.flatten()[1:]:
             assert ax.yaxis.major != ax_ref.yaxis.major
             assert ax.yaxis.minor != ax_ref.yaxis.minor
+        for ax in axes.flatten():
+            assert_visible_yticklabels(ax)
 
 
-_SHARE_OPTIONS = ['all', 'row', 'col', 'none']
+_SHARE_OPTIONS = ['all', 'row', 'col', 'none', True, False]
 
 
 @pytest.mark.parametrize(
