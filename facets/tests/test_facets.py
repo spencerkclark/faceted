@@ -417,3 +417,13 @@ def test_share_axes_mixin(sharex, sharey):
     grid = shared_grid(sharex, sharey)
     assert_valid_x_sharing(grid, sharex)
     assert_valid_y_sharing(grid, sharey)
+
+
+def test_cartopy():
+    pytest.importorskip('cartopy')
+    import cartopy.crs as ccrs
+    from cartopy.mpl.geoaxes import GeoAxes
+
+    fig, axes = facets(2, 2, axes_kwargs={'projection': ccrs.PlateCarree()})
+    for ax in axes:
+        assert isinstance(ax, GeoAxes)
