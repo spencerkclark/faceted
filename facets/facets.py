@@ -232,16 +232,18 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         # and the colorbar mode is 'single', AxesGrid adds an extra
         # axes pad to the colorbar padding; we correct this manually here.
         if self.cbar_location == 'bottom' and self.cbar_mode == 'single':
-            self.cbar_pad = self.cbar_pad - self.axes_pad[1]
+            axes_grid_cbar_pad = self.cbar_pad - self.axes_pad[1]
         elif self.cbar_location == 'left' and self.cbar_mode == 'single':
-            self.cbar_pad = self.cbar_pad - self.axes_pad[0]
+            axes_grid_cbar_pad = self.cbar_pad - self.axes_pad[0]
+        else:
+            axes_grid_cbar_pad = self.cbar_pad
 
         self.cbar_short_side_pad = cbar_short_side_pad
 
         self.fig = plt.figure()
         self.grid = AxesGrid(
             self.fig, self.rect(), nrows_ncols=(self.rows, self.cols),
-            cbar_size=self.cbar_size, cbar_pad=self.cbar_pad,
+            cbar_size=self.cbar_size, cbar_pad=axes_grid_cbar_pad,
             axes_pad=self.axes_pad, cbar_mode=self.cbar_mode,
             cbar_location=self.cbar_location, aspect=False
         )
