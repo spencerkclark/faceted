@@ -104,6 +104,19 @@ def test_width_constrained_caxes_positions(grid):
         pytest.skip('Skipping colorbar positions test, because cbar_mode=None')
 
 
+def test_plot_aspect(grid):
+    fig = grid.fig
+    width, height = fig.get_size_inches()
+    for ax in grid.axes:
+        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+        _, _, _plot_width, _plot_height = ax_bounds
+        plot_width = _plot_width * width
+        plot_height = _plot_height * height
+        expected = grid.aspect
+        result = plot_height / plot_width
+        np.testing.assert_allclose(result, expected)
+
+
 def check_width_constrained_axes_positions_none(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
