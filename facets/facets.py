@@ -183,7 +183,7 @@ class ShareAxesMixin(object):
 
         return axes
 
-    def set_ticklabel_visibility(self):
+    def make_shared_ticklabels_invisible(self):
         """Make inner Axes tick labels of shared Axes invisible."""
         axes = np.reshape(self.axes, (self.rows, self.cols))
         if self.sharex in ['col', 'all']:
@@ -249,7 +249,7 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         )
         self.fig.set_size_inches(self.width, self.height)
         self.axes = self.redraw_axes()
-        self.set_ticklabel_visibility()
+        self.make_shared_ticklabels_invisible()
         self.caxes = self.resize_colorbars()
 
     @property
