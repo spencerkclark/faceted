@@ -76,12 +76,6 @@ def grid(request):
     plt.close(obj.fig)
 
 
-def get_position(ax):
-    locator = ax.get_axes_locator()
-    position = locator(ax, None)
-    return position
-
-
 def get_tile_width(grid, left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD):
     return (grid.width - left_pad - right_pad
             - (grid.cols - 1) * _INTERNAL_PAD) / grid.cols
@@ -110,14 +104,28 @@ def test_width_constrained_caxes_positions(grid):
         pytest.skip('Skipping colorbar positions test, because cbar_mode=None')
 
 
+def test_plot_aspect(grid):
+    fig = grid.fig
+    width, height = fig.get_size_inches()
+    for ax in grid.axes:
+        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+        _, _, _plot_width, _plot_height = ax_bounds
+        plot_width = _plot_width * width
+        plot_height = _plot_height * height
+        expected = grid.aspect
+        result = plot_height / plot_width
+        np.testing.assert_allclose(result, expected)
+
+
 def check_width_constrained_axes_positions_none(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
+    fig = grid.fig
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     for ax, (row, col) in zip(grid.axes, indexes):
-        ax_bounds = get_position(ax).bounds
+        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
         x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
         y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
         dx = tile_width / width
@@ -130,6 +138,7 @@ def check_width_constrained_axes_positions_single(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     cbar_location = grid.cbar_location
+    fig = grid.fig
 
     left_pad, right_pad = _LEFT_PAD, _RIGHT_PAD
     bottom_pad, top_pad = _BOTTOM_PAD, _TOP_PAD
@@ -148,7 +157,7 @@ def check_width_constrained_axes_positions_single(grid):
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     axes = grid.axes
     for ax, (row, col) in zip(axes, indexes):
-        ax_bounds = get_position(ax).bounds
+        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
         x0 = (left_pad + col * (_INTERNAL_PAD + tile_width)) / width
         y0 = (bottom_pad + row * (_INTERNAL_PAD + tile_height)) / height
         dx = tile_width / width
@@ -193,12 +202,13 @@ def check_width_constrained_axes_positions_each(grid):
     width, height = grid.width, grid.height
     tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
     cbar_location = grid.cbar_location
+    fig = grid.fig
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     axes = grid.axes
     if cbar_location == 'bottom':
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = get_position(ax).bounds
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
             x0 = (_LEFT_PAD + col * (tile_width + _INTERNAL_PAD)) / width
             y0 = (_BOTTOM_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD +
                   row * (tile_height + _INTERNAL_PAD)) / height
@@ -208,7 +218,7 @@ def check_width_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == 'top':
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = get_position(ax).bounds
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
             x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
             dx = tile_width / width
@@ -217,7 +227,7 @@ def check_width_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == 'right':
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = get_position(ax).bounds
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
             x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
             dx = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
@@ -226,7 +236,7 @@ def check_width_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == 'left':
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = get_position(ax).bounds
+            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
             x0 = (_LEFT_PAD + _CBAR_THICKNESS + _LONG_SIDE_PAD +
                   col * (_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height)) / height
@@ -287,3 +297,148 @@ def check_width_constrained_caxes_positions_each(grid):
             dy = (tile_height - 2. * _SHORT_SIDE_PAD) / height
             expected_bounds = [x0, y0, dx, dy]
             np.testing.assert_allclose(cax_bounds, expected_bounds)
+
+
+def shared_grid(sharex, sharey):
+    return WidthConstrainedAxesGrid(
+        2, 2, _WIDTH_CONSTRAINT, sharex=sharex, sharey=sharey,
+        cbar_mode='single')
+
+
+def assert_visible_xticklabels(ax):
+    assert ax.xaxis._get_tick(ax.xaxis.major).label1On
+    assert ax.xaxis._get_tick(ax.xaxis.minor).label1On
+
+
+def assert_invisible_xticklabels(ax):
+    assert not ax.xaxis._get_tick(ax.xaxis.major).label1On
+    assert not ax.xaxis._get_tick(ax.xaxis.minor).label1On
+
+
+def assert_visible_yticklabels(ax):
+    assert ax.yaxis._get_tick(ax.yaxis.major).label1On
+    assert ax.yaxis._get_tick(ax.yaxis.minor).label1On
+
+
+def assert_invisible_yticklabels(ax):
+    assert not ax.yaxis._get_tick(ax.yaxis.major).label1On
+    assert not ax.yaxis._get_tick(ax.yaxis.minor).label1On
+
+
+def assert_valid_x_sharing(shared_grid, sharex):
+    axes = np.reshape(shared_grid.axes, (shared_grid.rows, shared_grid.cols))
+    if sharex in ['all', True]:
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten():
+            assert ax.xaxis.major == ax_ref.xaxis.major
+            assert ax.xaxis.minor == ax_ref.xaxis.minor
+        for ax in axes[:-1, :].flatten():
+            assert_invisible_xticklabels(ax)
+        for ax in axes[-1, :].flatten():
+            assert_visible_xticklabels(ax)
+    elif sharex == 'row':
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row:
+                assert ax.xaxis.major == ax_ref.xaxis.major
+                assert ax.xaxis.minor == ax_ref.xaxis.minor
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col[1:]:
+                assert ax.xaxis.major != ax_ref.xaxis.major
+                assert ax.xaxis.minor != ax_ref.xaxis.minor
+        for ax in axes.flatten():
+            assert_visible_xticklabels(ax)
+    elif sharex == 'col':
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col:
+                assert ax.xaxis.major == ax_ref.xaxis.major
+                assert ax.xaxis.minor == ax_ref.xaxis.minor
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row[1:]:
+                assert ax.xaxis.major != ax_ref.xaxis.major
+                assert ax.xaxis.minor != ax_ref.xaxis.minor
+        for ax in axes[:-1, :].flatten():
+            assert_invisible_xticklabels(ax)
+        for ax in axes[-1, :].flatten():
+            assert_visible_xticklabels(ax)
+    elif sharex in ['none', False]:
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten()[1:]:
+            assert ax.xaxis.major != ax_ref.xaxis.major
+            assert ax.xaxis.minor != ax_ref.xaxis.minor
+        for ax in axes.flatten():
+            assert_visible_xticklabels(ax)
+
+
+def assert_valid_y_sharing(shared_grid, sharey):
+    axes = np.reshape(shared_grid.axes, (shared_grid.rows, shared_grid.cols))
+    if sharey in ['all', True]:
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten():
+            assert ax.yaxis.major == ax_ref.yaxis.major
+            assert ax.yaxis.minor == ax_ref.yaxis.minor
+        for ax in axes[:, 1:].flatten():
+            assert_invisible_yticklabels(ax)
+        for ax in axes[:, 0].flatten():
+            assert_visible_yticklabels(ax)
+    elif sharey == 'row':
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row:
+                assert ax.yaxis.major == ax_ref.yaxis.major
+                assert ax.yaxis.minor == ax_ref.yaxis.minor
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col[1:]:
+                assert ax.yaxis.major != ax_ref.yaxis.major
+                assert ax.yaxis.minor != ax_ref.yaxis.minor
+        for ax in axes[:, 1:].flatten():
+            assert_invisible_yticklabels(ax)
+        for ax in axes[:, 0].flatten():
+            assert_visible_yticklabels(ax)
+    elif sharey == 'col':
+        for col in axes.T:
+            ax_ref = col[0]
+            for ax in col:
+                assert ax.yaxis.major == ax_ref.yaxis.major
+                assert ax.yaxis.minor == ax_ref.yaxis.minor
+        for row in axes:
+            ax_ref = row[0]
+            for ax in row[1:]:
+                assert ax.yaxis.major != ax_ref.yaxis.major
+                assert ax.yaxis.minor != ax_ref.yaxis.minor
+        for ax in axes.flatten():
+            assert_visible_yticklabels(ax)
+    elif sharey in ['none', False]:
+        ax_ref = axes.flatten()[0]
+        for ax in axes.flatten()[1:]:
+            assert ax.yaxis.major != ax_ref.yaxis.major
+            assert ax.yaxis.minor != ax_ref.yaxis.minor
+        for ax in axes.flatten():
+            assert_visible_yticklabels(ax)
+
+
+_SHARE_OPTIONS = ['all', 'row', 'col', 'none', True, False]
+
+
+@pytest.mark.parametrize(
+    ('sharex', 'sharey'), product(_SHARE_OPTIONS, _SHARE_OPTIONS))
+def test_share_axes_mixin(sharex, sharey):
+    grid = shared_grid(sharex, sharey)
+    assert_valid_x_sharing(grid, sharex)
+    assert_valid_y_sharing(grid, sharey)
+    plt.close(grid.fig)
+
+
+def test_cartopy():
+    pytest.importorskip('cartopy')
+    import cartopy.crs as ccrs
+    from cartopy.mpl.geoaxes import GeoAxes
+
+    fig, axes = facets(2, 2, axes_kwargs={'projection': ccrs.PlateCarree()})
+    for ax in axes:
+        assert isinstance(ax, GeoAxes)
+    plt.close(fig)
