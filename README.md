@@ -100,7 +100,7 @@ fig.savefig('colorbar-grid-example.png')
 
 ![colorbar-grid-example.png](facets/examples/colorbar-grid-example.png?raw=true)
 
-Finally, this is an example of a multi-panel plot with colorbars attached to
+You can also create a multi-panel plot with colorbars attached to
 every panel:
 ```python
 import matplotlib.pyplot as plt
@@ -133,3 +133,74 @@ fig.savefig('multi-colorbar-grid-example.png')
 ```
 
 ![multi-colorbar-grid-example.png](facets/examples/multi-colorbar-grid-example.png?raw=true)
+
+Finally, things work seamlessly with `cartopy`.  You just need to provide a
+`projection` argument to `axes_kwargs` and the `Axes` objects that `facets`
+returns will be of the type `cartopy.mpl.geoaxes.GeoAxes`:
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+import numpy as np
+
+from facets import facets
+
+fig, axes, cax = facets(
+    2, 3, width=8., aspect=0.5,
+    internal_pad=0.2, top_pad=0.5,
+    bottom_pad=0.5, left_pad=0.5, right_pad=1., cbar_mode='single',
+    cbar_pad=0.2, cbar_short_side_pad=0.1, cbar_location='right',
+    axes_kwargs={'projection': ccrs.Mollweide()})
+
+x = np.linspace(0., 360., 128, endpoint=False)
+y = np.linspace(-89.9, 89.9, 64, endpoint=True)
+xg, yg = np.meshgrid(x, y)
+z = np.sin(6. * np.pi * xg / 360.) * np.cos(6. * np.pi * yg / 180.)
+levels = np.arange(-1., 1.05, 0.1)
+
+for ax in axes:
+    c = ax.pcolormesh(x, y, z, vmin=-1., vmax=1., cmap='RdBu', transform=ccrs.PlateCarree())
+    ax.set_global()
+
+plt.colorbar(c, cax=cax, label='Example')
+fig.savefig('cartopy-example.png')
+```
+
+![cartopy-example.png](facets/examples/cartopy-example.png?raw=true)
+
+Because `facets` implements axes-sharing internally, rather than relying on
+`AxesGrid`, the visibility of ticklabels is controlled directly through your
+`sharex` and `sharey` settings
+(despite
+[SciTools/cartopy#939](https://github.com/SciTools/cartopy/issues/939)
+this works whether you are using `cartopy` or
+not).  By default, `sharex` and `sharey` are set to `'all'`, meaning that
+ticklabels will be drawn on the left and bottom axes.  If you wanted ticklabels
+to be drawn on all the x-axes, then you could specify `sharex='row'`.  Note
+that `cartopy` only allows ticklabels to be drawn for the Mercator and
+PlateCarree projections currently:
+```python
+fig, axes, cax = facets(
+    2, 3, width=8., aspect=0.5,
+    internal_pad=0.35, top_pad=0.5,
+    bottom_pad=0.5, left_pad=0.5, right_pad=1., cbar_mode='single',
+    cbar_pad=0.35, cbar_short_side_pad=0.1, cbar_location='right',
+    axes_kwargs={'projection': ccrs.PlateCarree()}, sharex='row')
+
+x = np.linspace(0., 360., 128, endpoint=False)
+y = np.linspace(-89.9, 89.9, 64, endpoint=True)
+xg, yg = np.meshgrid(x, y)
+z = np.sin(6. * np.pi * xg / 360.) * np.cos(6. * np.pi * yg / 180.)
+levels = np.arange(-1., 1.05, 0.1)
+
+for ax in axes:
+    c = ax.pcolormesh(x, y, z, vmin=-1., vmax=1., cmap='RdBu', transform=ccrs.PlateCarree())
+    ax.set_xticks(np.arange(-180., 181., 90.))
+    ax.set_yticks(np.arange(-90., 91., 30))
+    ax.set_global()
+    ax.coastlines(color='gray')
+
+plt.colorbar(c, cax=cax, label='Example')
+fig.savefig('cartopy-example-sharex-row.png')
+```
+
+![cartopy-example-sharex-row.png](facets/examples/cartopy-example-sharex-row.png?raw=true)
