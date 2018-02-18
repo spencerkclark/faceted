@@ -19,5 +19,5 @@ def test_example_notebook():
     with open(os.path.join(rootdir, 'examples.ipynb')) as nb_file:
         notebook = nbformat.read(nb_file, as_version=nbformat.NO_CONVERT)
     kernel_name = 'python' + str(sys.version[0])
-    ep = ExecutePreprocessor(kernel_name=kernel_name)
+    ep = ExecutePreprocessor(timeout=600, kernel_name=kernel_name)
     ep.preprocess(notebook, {})
