@@ -32,6 +32,17 @@ axes ticks, ticklabels, and labels).  This eliminates the need for using
 `bbox_inches='tight'` when saving the figure, and enables you 
 to make sure that your figures are *exactly* the dimensions you need for your use.
 
+Installation
+------------
+
+Currently, the only way to install `facets` is directly from the source.  You
+can do so using `pip`:
+```
+$ git clone https://github.com/spencerkclark/facets.git
+$ cd facets
+$ pip install -e .
+```
+
 Examples
 --------
 
