@@ -33,7 +33,7 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Spacing (in inches) between right of figure and axes
     internal_pad : float
         Spacing in between tiles (in inches)
-    cbar_mode : {None, 'single', 'each'}
+    cbar_mode : {None, 'single', 'edge', 'each'}
         Mode for adding colorbar(s) to figure
     cbar_short_side_pad : float
         Spacing between the ends of the colorbar and the edges
