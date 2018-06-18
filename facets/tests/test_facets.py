@@ -168,7 +168,7 @@ def check_width_constrained_axes_positions_single(grid):
         dy = tile_height / height
         expected_bounds = [x0, y0, dx, dy]
         np.testing.assert_allclose(ax_bounds, expected_bounds)
-    
+
 
 def check_width_constrained_caxes_positions_single(grid):
     width, height = grid.width, grid.height
@@ -199,7 +199,7 @@ def check_width_constrained_caxes_positions_single(grid):
         dy = (height - _TOP_PAD - _BOTTOM_PAD - 2. * _SHORT_SIDE_PAD) / height
     expected_bounds = [x0, y0, dx, dy]
     np.testing.assert_allclose(cax_bounds, expected_bounds)
-    
+
 
 def check_width_constrained_axes_positions_each(grid):
     rows, cols = grid.rows, grid.cols
