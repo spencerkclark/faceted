@@ -66,7 +66,7 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
     )
     if cbar_mode is None:
         return grid.fig, grid.axes
-    elif cbar_mode in ['each', 'single']:
+    elif cbar_mode in ['each', 'edge', 'single']:
         return grid.fig, grid.axes, grid.caxes
 
 
@@ -90,6 +90,9 @@ class CbarShortSidePadMixin(object):
         short-side pad option"""
         if self.cbar_mode == 'each':
             return [self.resize_colorbar(cax) for cax in self.grid.cbar_axes]
+        elif self.cbar_mode == 'edge':
+            return [self.resize_colorbar(cax) for cax in self.grid.cbar_axes
+                    if cax.get_axes_locator() is not None]
         elif self.cbar_mode == 'single':
             return self.resize_colorbar(self.grid.cbar_axes[0])
         else:
@@ -265,7 +268,8 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         elif self.cbar_mode == 'each' and self.cbar_location in _LR:
             return (inner_width - inner_pad
                     - self.cols * cbar_width) / self.cols
-        elif self.cbar_mode == 'single' and self.cbar_location in _LR:
+        elif (self.cbar_mode == 'single' or
+              self.cbar_mode == 'edge') and self.cbar_location in _LR:
             return (inner_width - inner_pad - cbar_width) / self.cols
         else:
             raise ValueError('Invalid cbar_mode or cbar_location provided')
@@ -289,7 +293,8 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         elif self.cbar_mode == 'each' and self.cbar_location in _BT:
             return (total_plot_height + total_axes_pad + outer_pad + self.rows
                     * cbar_width)
-        elif self.cbar_mode == 'single' and self.cbar_location in _BT:
+        elif (self.cbar_mode == 'single' or
+              self.cbar_mode == 'edge') and self.cbar_location in _BT:
             return (total_plot_height + total_axes_pad + outer_pad +
                     cbar_width)
 
