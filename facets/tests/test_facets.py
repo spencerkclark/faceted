@@ -46,7 +46,7 @@ def test_facets_cbar_mode_invalid():
 
 
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
-_CBAR_MODES = [None, 'single', 'each']
+_CBAR_MODES = [None, 'single', 'each', 'edge']
 _CBAR_LOCATIONS = ['bottom', 'right', 'top', 'left']
 _CG_LAYOUTS = product(_CBAR_MODES, _CBAR_LOCATIONS, _LAYOUTS)
 
@@ -91,6 +91,8 @@ def test_width_constrained_axes_positions(grid):
         check_width_constrained_axes_positions_each(grid)
     elif grid.cbar_mode == 'single':
         check_width_constrained_axes_positions_single(grid)
+    elif grid.cbar_mode == 'edge':
+        check_width_constrained_axes_positions_edge(grid)
     elif grid.cbar_mode is None:
         check_width_constrained_axes_positions_none(grid)
 
@@ -100,6 +102,8 @@ def test_width_constrained_caxes_positions(grid):
         check_width_constrained_caxes_positions_each(grid)
     elif grid.cbar_mode == 'single':
         check_width_constrained_caxes_positions_single(grid)
+    elif grid.cbar_mode == 'edge':
+        check_width_constrained_caxes_positions_edge(grid)
     elif grid.cbar_mode is None:
         pytest.skip('Skipping colorbar positions test, because cbar_mode=None')
 
@@ -299,6 +303,61 @@ def check_width_constrained_caxes_positions_each(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
 
 
+def check_width_constrained_axes_positions_edge(grid):
+    # The positions of the axes are the same as for cbar_mode='single'
+    check_width_constrained_axes_positions_single(grid)
+
+
+def check_width_constrained_caxes_positions_edge(grid):
+    rows, cols = grid.rows, grid.cols
+    width, height = grid.width, grid.height
+    tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
+    cbar_location = grid.cbar_location
+    fig = grid.fig
+
+    caxes = grid.caxes
+    if cbar_location == 'bottom':
+        for col, cax in zip(range(cols), caxes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width) +
+                  _SHORT_SIDE_PAD) / width
+            y0 = _BOTTOM_PAD / height
+            dx = (tile_width - 2. * _SHORT_SIDE_PAD) / width
+            dy = _CBAR_THICKNESS / height
+            expected_bounds = [x0, y0, dx, dy]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    elif cbar_location == 'top':
+        for col, cax in zip(range(cols), caxes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (_LEFT_PAD + col * (_INTERNAL_PAD + tile_width) +
+                  _SHORT_SIDE_PAD) / width
+            y0 = (height - _CBAR_THICKNESS - _TOP_PAD) / height
+            dx = (tile_width - 2. * _SHORT_SIDE_PAD) / width
+            dy = _CBAR_THICKNESS / height
+            expected_bounds = [x0, y0, dx, dy]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    elif cbar_location == 'right':
+        for row, cax in zip(range(rows - 1, -1, -1), caxes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = (width - _CBAR_THICKNESS - _RIGHT_PAD) / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
+                  _SHORT_SIDE_PAD) / height
+            dx = _CBAR_THICKNESS / width
+            dy = (tile_height - 2. * _SHORT_SIDE_PAD) / height
+            expected_bounds = [x0, y0, dx, dy]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    elif cbar_location == 'left':
+        for row, cax in zip(range(rows - 1, -1, -1), caxes):
+            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            x0 = _LEFT_PAD / width
+            y0 = (_BOTTOM_PAD + row * (_INTERNAL_PAD + tile_height) +
+                  _SHORT_SIDE_PAD) / height
+            dx = _CBAR_THICKNESS / width
+            dy = (tile_height - 2. * _SHORT_SIDE_PAD) / height
+            expected_bounds = [x0, y0, dx, dy]
+            np.testing.assert_allclose(cax_bounds, expected_bounds)
+    
+            
 def shared_grid(sharex, sharey):
     return WidthConstrainedAxesGrid(
         2, 2, _WIDTH_CONSTRAINT, sharex=sharex, sharey=sharey,
