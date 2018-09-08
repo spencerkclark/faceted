@@ -59,6 +59,8 @@ labels, arguments are provided to add padding to the outer edges of the figure
 (the `Axes` objects are then sized accordingly to keep the overall figure width
 constant). 
 
+### Parameters controlling figure and axes dimensions
+
 The arguments controlling the aspect ratio, colorbar width, and overall width
 of the plot are depicted in the figure below:
 ![dimensions.png](dimensions.png?raw=true)
@@ -66,6 +68,8 @@ of the plot are depicted in the figure below:
 - y/x: `aspect` controls the aspect ratio of the plotting axes
 - z: `cbar_size` controls the thickness of the colorbar in inches (default is
   `0.125`).
+
+### Parameters controlling padding
 
 The arguments controlling the padding between axes, and padding on the edges of
 the figure, are explained below:
@@ -83,7 +87,7 @@ the figure, are explained below:
 - F: `internal_pad` controls the spacing between the non-colorbar axes (for now
   this is both the vertical and horizontal spacing) in inches
 - G: `cbar_pad` controls the spacing (in inches) between the edge of the
-  non-colorbar axes and the colorbar axes
+  non-colorbar axes and the colorbar axes.
 
 Examples
 --------
