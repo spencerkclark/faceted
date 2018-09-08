@@ -43,6 +43,35 @@ $ cd facets
 $ pip install -e .
 ```
 
+Interface
+---------
+
+`facets` provides an analog to `matplotlib.pyplot.subplots` for producing
+figures with strict width constraints, and various colorbar arrangement
+options.  Like `subplots`, the `facets` function returns a `Figure` object and
+a list of `Axes` objects; unlike `subplots`, `facets` can also optionally
+return `Axes` object(s) for colorbar(s).  The `Axes` objects are carefully
+sized such that the panels used for making plots have the prescribed aspect
+ratio (this is helpful, e.g., when producing plots over maps).  In addition,
+the colorbar(s) are sized to have a fixed thickness (in inches), which is nice,
+for example, for consistency throughout a manuscript.  To make room for axes
+labels, arguments are provided to add padding to the outer edges of the figure
+(the `Axes` objects are then sized accordingly to keep the overall figure width
+constant). 
+
+The arguments controlling the aspect ratio, colorbar width, and overall width
+of the plot are depicted in the figure below:
+![dimensions.png](dimensions.png?raw=true)
+- `width` controls the overall width of the figure in inches
+- `aspect` controls the aspect ratio of the plotting axes (`y/x`)
+- `cbar_size` controls the thickness of the colorbar in inches (default is
+  `0.125`).
+
+The arguments controlling the padding between axes, and padding on the edges of
+the figure, are explained below:
+![padding.png](padding.png?raw=true)
+
+
 Examples
 --------
 
