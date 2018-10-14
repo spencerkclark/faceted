@@ -43,6 +43,52 @@ $ cd facets
 $ pip install -e .
 ```
 
+Interface
+---------
+
+`facets` provides an analog to `matplotlib.pyplot.subplots` for producing
+figures with strict width constraints, and various colorbar arrangement
+options.  Like `subplots`, the `facets` function returns a `Figure` object and
+a list of `Axes` objects; unlike `subplots`, `facets` can also optionally
+return `Axes` object(s) for colorbar(s).  The `Axes` objects are carefully
+sized such that the panels used for making plots have the prescribed aspect
+ratio (this is helpful, e.g., when producing plots over maps).  In addition,
+the colorbar(s) are sized to have a fixed thickness (in inches), which is nice,
+for example, for consistency throughout a manuscript.  To make room for axes
+labels, arguments are provided to add padding to the outer edges of the figure
+(the `Axes` objects are then sized accordingly to keep the overall figure width
+constant). 
+
+### Parameters controlling figure and axes dimensions
+
+The arguments controlling the aspect ratio, colorbar width, and overall width
+of the plot are depicted in the figure below:
+![dimensions.png](dimensions.png?raw=true)
+- W: `width` controls the overall width of the figure in inches
+- y/x: `aspect` controls the aspect ratio of the plotting axes
+- z: `cbar_size` controls the thickness of the colorbar in inches (default is
+  `0.125`).
+
+### Parameters controlling padding
+
+The arguments controlling the padding between axes, and padding on the edges of
+the figure, are explained below:
+![padding.png](padding.png?raw=true)
+- A: `left_pad` controls the spacing between the left-most axes and the edge of
+  the figure in inches
+- B: `right_pad` controls the spacing between the right-most axes and the edge
+  of the figure in inches
+- C: `bottom_pad` controls the spacing between the bottom-most axes and the
+  edge of the figure in inches
+- D: `top_pad` controls the spacing between the top-most axes and the edge of
+  the figure in inches
+- E: `cbar_short_side_pad` controls the spacing between the edges of the
+  colorbar and the edges of the axes in inches
+- F: `internal_pad` controls the spacing between the non-colorbar axes (for now
+  this is both the vertical and horizontal spacing) in inches
+- G: `cbar_pad` controls the spacing (in inches) between the edge of the
+  non-colorbar axes and the colorbar axes.
+
 Examples
 --------
 
