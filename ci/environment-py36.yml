@@ -5,7 +5,7 @@ dependencies:
     - python=3.6
     - cartopy
     - jupyter
-    - matplotlib
+    - matplotlib=2.2.3
     - numpy
     - pytest
     - pip:
