@@ -31,8 +31,11 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Spacing (in inches) between left of figure and axes
     right_pad : float
         Spacing (in inches) between right of figure and axes
-    internal_pad : float
-        Spacing in between tiles (in inches)
+    internal_pad : float or tuple
+        Spacing in between panels in both the horizontal and vertical
+        directions (in inches); if an individual number, the spacing is the
+        same in the horizontal and vertical; if a tuple is specified, the left
+        value is the horizontal pad, and the right value is the vertical pad.
     cbar_mode : {None, 'single', 'edge', 'each'}
         Mode for adding colorbar(s) to figure
     cbar_short_side_pad : float
@@ -56,6 +59,13 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
     -------
     fig, axes, caxes (if caxes requested)
     """
+    if isinstance(internal_pad, (float, int)):
+        internal_pad = (internal_pad, internal_pad)
+    if len(internal_pad) != 2:
+        raise ValueError('Invalid internal pad provided; it must either be a '
+                         'float or a sequence of two values.  Got '
+                         '{}'.format(internal_pad))
+
     grid = WidthConstrainedAxesGrid(
         rows, cols, width=width, aspect=aspect, top_pad=top_pad,
         bottom_pad=bottom_pad, left_pad=left_pad, right_pad=right_pad,
@@ -75,7 +85,7 @@ _BT = ['bottom', 'top']
 
 
 class CbarShortSidePadMixin(object):
-    """Methods to redraw colorbar Axes created in AxesGrid, allowing for 
+    """Methods to redraw colorbar Axes created in AxesGrid, allowing for
     customization of their length."""
     def resize_colorbar(self, cax):
         """Add a short-side pad to a given AxesGrid colorbar"""
@@ -206,7 +216,7 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
     """
     def __init__(self, rows, cols, width, top_pad=0., bottom_pad=0.,
                  left_pad=0., right_pad=0., cbar_size=0.125,
-                 cbar_pad=0.125, axes_pad=0.2, cbar_mode=None,
+                 cbar_pad=0.125, axes_pad=(0.2, 0.2), cbar_mode=None,
                  cbar_location='bottom', aspect=0.5, cbar_short_side_pad=0.,
                  sharex=False, sharey=False, axes_kwargs={}):
         self.rows = rows
@@ -214,8 +224,7 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         self.width = width
         self.aspect = aspect
 
-        # We'll put off supporting a tuple axes_pad until later
-        self.axes_pad = (axes_pad, axes_pad)
+        self.axes_pad = axes_pad
 
         self.top_pad = top_pad
         self.bottom_pad = bottom_pad
