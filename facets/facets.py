@@ -33,9 +33,9 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Spacing (in inches) between right of figure and axes
     internal_pad : float or tuple
         Spacing in between panels in both the horizontal and vertical
-        directions (in inches); if an individual float, the spacing is the same
-        in the horizontal and vertical; if a tuple is specified, the left value
-        is the horizontal pad, and the right value is the vertical pad.
+        directions (in inches); if an individual number, the spacing is the
+        same in the horizontal and vertical; if a tuple is specified, the left
+        value is the horizontal pad, and the right value is the vertical pad.
     cbar_mode : {None, 'single', 'edge', 'each'}
         Mode for adding colorbar(s) to figure
     cbar_short_side_pad : float
@@ -59,7 +59,7 @@ def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
     -------
     fig, axes, caxes (if caxes requested)
     """
-    if isinstance(internal_pad, float):
+    if isinstance(internal_pad, (float, int)):
         internal_pad = (internal_pad, internal_pad)
     if len(internal_pad) != 2:
         raise ValueError('Invalid internal pad provided; it must either be a '

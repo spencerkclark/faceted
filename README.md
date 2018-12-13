@@ -85,7 +85,7 @@ the figure, are explained below:
 - E: `cbar_short_side_pad` controls the spacing between the edges of the
   colorbar and the edges of the axes in inches
 - F: `internal_pad` controls the spacing between the non-colorbar axes in
-  inches.  It can either be a float (and specify the horizontal and vertical
+  inches.  It can either be a number (and specify the horizontal and vertical
   pad at the same time) or it can be a length-two sequence (and specify both
   the horizontal and vertical pads, respectively).
 - G: `cbar_pad` controls the spacing (in inches) between the edge of the
