@@ -47,6 +47,11 @@ def test_facets_cbar_mode_invalid():
         facets(1, 2, cbar_mode='invalid')
 
 
+def test_facets_invalid_internal_pad():
+    with pytest.raises(ValueError):
+        facets(1, 2, internal_pad=(1, 2, 3))
+
+
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
 _CBAR_MODES = [None, 'single', 'each', 'edge']
 _CBAR_LOCATIONS = ['bottom', 'right', 'top', 'left']
