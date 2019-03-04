@@ -22,7 +22,7 @@ different features.  Using it in many ways resembles using ``plt.subplots``.
         ax.set_xlabel('Time')
         ax.set_ylabel('Temperature [C]')
 
-    @savefig example_tair_base3.png
+    @savefig example_tair_base.png
     fig.show()
 
         
@@ -47,7 +47,7 @@ width.
         ax.set_xlabel('Time')
         ax.set_ylabel('Temperature [C]')
 
-    @savefig example_tair_padding4.png
+    @savefig example_tair_padding.png
     fig.show()
         
 Sharing axes
@@ -205,7 +205,7 @@ specifying ``cbar_mode='each'`` as an argument in the call to ``faceted``.
         cb.locator = tick_locator
         cb.update_ticks()
         
-    @savefig example_tair_each_cbar2.png
+    @savefig example_tair_each_cbar.png
     fig.show()
 
 
