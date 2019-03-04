@@ -8,7 +8,7 @@ complexity (some in fact are quite elegant).  It might be tempting to go with
 one of these solutions, e.g.
 
 .. ipython:: python
-
+    :okwarning:
     import xarray as xr
     import matplotlib.pyplot as plt
 
@@ -238,7 +238,7 @@ parameters:
     bottom = p_bottom / h
 
 .. ipython:: python
-
+    :okwarning:
     import cartopy.crs as ccrs
 
     ds = xr.tutorial.load_dataset('rasm').isel(time=slice(0, 3))

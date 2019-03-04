@@ -5,7 +5,7 @@ Using faceted
 different features.  Using it in many ways resembles using ``plt.subplots``.
 
 .. ipython:: python
-
+    :okwarning:
     import matplotlib.pyplot as plt
     import xarray as xr
     from faceted import faceted
@@ -102,7 +102,7 @@ A single colorbar is useful when we use the same color scale for all panels of
 a figure.  
 
 .. ipython:: python
-
+    :okwarning:
     import cartopy.crs as ccrs
 
     ds = xr.tutorial.load_dataset('rasm')
