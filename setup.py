@@ -1,5 +1,6 @@
 import setuptools
 
+import versioneer
 
 LONG_DESCRIPTION = """
 This is a module that I use in practice to produce both single and multi-panel
@@ -23,7 +24,8 @@ context of your figure size).
 
 setuptools.setup(
     name='faceted',
-    version='0.1',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     packages=setuptools.find_packages(),
     author='Spencer K. Clark',
     description='Precisely spaced subplots',

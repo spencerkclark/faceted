@@ -5,7 +5,7 @@ dependencies:
     - python=3.6
     - cartopy=0.15.1
     - jupyter
-    - matplotlib=2.2
+    - matplotlib
     - nc-time-axis
     - numpy
     - pytest
