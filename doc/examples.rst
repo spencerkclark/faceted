@@ -154,7 +154,7 @@ We'll show an example where the rows share a colorbar.
         ax.set_title('')
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_extent([-180, 0, 15, 90], crs=ccrs.PlateCarree())
+        ax.set_extent([180, 360, 15, 90], crs=ccrs.PlateCarree())
         ax.coastlines()
 
     plt.colorbar(c1, cax=cax1, label='[C]');

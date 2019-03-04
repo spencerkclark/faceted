@@ -3,9 +3,9 @@ channels:
     - conda-forge
 dependencies:
     - python=3.6
-    - cartopy
+    - cartopy=0.15.1
     - jupyter
-    - matplotlib
+    - matplotlib=2.2
     - nc-time-axis
     - numpy
     - pytest
