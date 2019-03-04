@@ -31,6 +31,5 @@ setuptools.setup(
     install_requires=[
         'matplotlib >= 1.5',
         'numpy >= 1.7',
-    ],
-    scripts=['faceted/examples/examples.ipynb']
+    ]
 )
