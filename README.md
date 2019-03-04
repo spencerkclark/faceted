@@ -1,8 +1,8 @@
 faceted
-======
+=======
 
-[![Build Status](https://travis-ci.org/spencerkclark/facets.svg?branch=master)](https://travis-ci.org/spencerkclark/facets)
-[![Coverage Status](https://coveralls.io/repos/github/spencerkclark/facets/badge.svg?branch=master)](https://coveralls.io/github/spencerkclark/facets?branch=master)
+[![Build Status](https://travis-ci.org/spencerkclark/faceted.svg?branch=master)](https://travis-ci.org/spencerkclark/faceted)
+[![Coverage Status](https://coveralls.io/repos/github/spencerkclark/faceted/badge.svg?branch=master)](https://coveralls.io/github/spencerkclark/faceted?branch=master)
 
 Figures with precise control over overall width, plot aspect ratio,
 between-plot spacing, and colorbar dimensions.
