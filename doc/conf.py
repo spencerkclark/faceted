@@ -23,6 +23,8 @@ import faceted
 
 allowed_failures = set()
 
+sys.path.insert(0, os.path.abspath('..'))
+
 print("python exec:", sys.executable)
 print("sys.path:", sys.path)
 
