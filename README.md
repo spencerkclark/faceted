@@ -1,4 +1,4 @@
-facets
+faceted
 ======
 
 [![Build Status](https://travis-ci.org/spencerkclark/facets.svg?branch=master)](https://travis-ci.org/spencerkclark/facets)
@@ -35,21 +35,21 @@ to make sure that your figures are *exactly* the dimensions you need for your us
 Installation
 ------------
 
-Currently, the only way to install `facets` is directly from the source.  You
+Currently, the only way to install `faceted` is directly from the source.  You
 can do so using `pip`:
 ```
-$ git clone https://github.com/spencerkclark/facets.git
-$ cd facets
+$ git clone https://github.com/spencerkclark/faceted.git
+$ cd faceted
 $ pip install -e .
 ```
 
 Interface
 ---------
 
-`facets` provides an analog to `matplotlib.pyplot.subplots` for producing
+`faceted` provides an analog to `matplotlib.pyplot.subplots` for producing
 figures with strict width constraints, and various colorbar arrangement
-options.  Like `subplots`, the `facets` function returns a `Figure` object and
-a list of `Axes` objects; unlike `subplots`, `facets` can also optionally
+options.  Like `subplots`, the `faceted` function returns a `Figure` object and
+a list of `Axes` objects; unlike `subplots`, `faceted` can also optionally
 return `Axes` object(s) for colorbar(s).  The `Axes` objects are carefully
 sized such that the panels used for making plots have the prescribed aspect
 ratio (this is helpful, e.g., when producing plots over maps).  In addition,
@@ -99,10 +99,10 @@ This is a simple multi-panel plot with no colorbar(s):
 import matplotlib.pyplot as plt
 import numpy
 
-from facets import facets
+from faceted import faceted
 
 
-fig, axes = facets(2, 3, width=8., aspect=0.6,
+fig, axes = faceted(2, 3, width=8., aspect=0.6,
                    internal_pad=0.2, top_pad=0.5,
                    bottom_pad=0.5, left_pad=0.5, 
                    right_pad=0.5)
@@ -118,7 +118,7 @@ for ax in axes:
 fig.savefig('basic-grid-example.png')
 ```
 
-![basic-grid-example.png](facets/examples/basic-grid-example.png?raw=true)
+![basic-grid-example.png](faceted/examples/basic-grid-example.png?raw=true)
 
 This is a multi-panel plot with a common colorbar.  Note that
 despite [matplotlib/matplotlib#9778](https://github.com/matplotlib/matplotlib/issues/9778)
@@ -131,10 +131,10 @@ objects (of type `matplotlib.axes._axes.Axes`).
 import matplotlib.pyplot as plt
 import numpy as np
 
-from facets import facets
+from faceted import faceted
 
 
-fig, axes, cax = facets(
+fig, axes, cax = faceted(
     2, 3, width=8., 
     internal_pad=0.2, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=1.,
@@ -157,7 +157,7 @@ plt.colorbar(c, cax=cax, orientation='vertical', label='Example')
 fig.savefig('colorbar-grid-example.png')
 ```
 
-![colorbar-grid-example.png](facets/examples/colorbar-grid-example.png?raw=true)
+![colorbar-grid-example.png](faceted/examples/colorbar-grid-example.png?raw=true)
 
 You can also create a multi-panel plot with colorbars attached to
 every panel:
@@ -165,10 +165,10 @@ every panel:
 import matplotlib.pyplot as plt
 import numpy as np
 
-from facets import facets
+from faceted import faceted
 
 
-fig, axes, caxes = facets(
+fig, axes, caxes = faceted(
     2, 3, width=8., 
     internal_pad=0.7, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=0.5,
@@ -191,19 +191,19 @@ for ax, cax in zip(axes, caxes):
 fig.savefig('multi-colorbar-grid-example.png')
 ```
 
-![multi-colorbar-grid-example.png](facets/examples/multi-colorbar-grid-example.png?raw=true)
+![multi-colorbar-grid-example.png](faceted/examples/multi-colorbar-grid-example.png?raw=true)
 
 Finally, things work seamlessly with `cartopy`.  You just need to provide a
-`projection` argument to `axes_kwargs` and the `Axes` objects that `facets`
+`projection` argument to `axes_kwargs` and the `Axes` objects that `faceted`
 returns will be of the type `cartopy.mpl.geoaxes.GeoAxes`:
 ```python
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
 
-from facets import facets
+from faceted import faceted
 
-fig, axes, cax = facets(
+fig, axes, cax = faceted(
     2, 3, width=8., aspect=0.5,
     internal_pad=0.2, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=1., cbar_mode='single',
@@ -224,9 +224,9 @@ plt.colorbar(c, cax=cax, label='Example')
 fig.savefig('cartopy-example.png')
 ```
 
-![cartopy-example.png](facets/examples/cartopy-example.png?raw=true)
+![cartopy-example.png](faceted/examples/cartopy-example.png?raw=true)
 
-Because `facets` implements axes-sharing internally, rather than relying on
+Because `faceted` implements axes-sharing internally, rather than relying on
 `AxesGrid`, the visibility of ticklabels is controlled directly through your
 `sharex` and `sharey` settings
 (despite
@@ -238,7 +238,7 @@ to be drawn on all the x-axes, then you could specify `sharex='row'`.  Note
 that `cartopy` only allows ticklabels to be drawn for the Mercator and
 PlateCarree projections currently:
 ```python
-fig, axes, cax = facets(
+fig, axes, cax = faceted(
     2, 3, width=8., aspect=0.5,
     internal_pad=0.35, top_pad=0.5,
     bottom_pad=0.5, left_pad=0.5, right_pad=1., cbar_mode='single',
@@ -262,4 +262,4 @@ plt.colorbar(c, cax=cax, label='Example')
 fig.savefig('cartopy-example-sharex-row.png')
 ```
 
-![cartopy-example-sharex-row.png](facets/examples/cartopy-example-sharex-row.png?raw=true)
+![cartopy-example-sharex-row.png](faceted/examples/cartopy-example-sharex-row.png?raw=true)

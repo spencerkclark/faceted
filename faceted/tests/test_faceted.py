@@ -1,4 +1,4 @@
-"""Test suite for facets module"""
+"""Test suite for faceted module"""
 from collections import OrderedDict
 from itertools import product
 
@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from facets import facets, WidthConstrainedAxesGrid
+from faceted import faceted, WidthConstrainedAxesGrid
 
 
 plt.switch_backend('agg')
@@ -23,33 +23,33 @@ _LONG_SIDE_PAD = 0.25
 _CBAR_THICKNESS = 0.125
 
 
-def test_facets_cbar_mode_none():
-    fig, axes = facets(1, 2)
+def test_faceted_cbar_mode_none():
+    fig, axes = faceted(1, 2)
     assert len(axes) == 2
     plt.close(fig)
 
 
-def test_facets_cbar_mode_single():
-    fig, axes, cax = facets(1, 2, cbar_mode='single')
+def test_faceted_cbar_mode_single():
+    fig, axes, cax = faceted(1, 2, cbar_mode='single')
     assert len(axes) == 2
     plt.close(fig)
 
 
-def test_facets_cbar_mode_each():
-    fig, axes, caxes = facets(1, 2, cbar_mode='each')
+def test_faceted_cbar_mode_each():
+    fig, axes, caxes = faceted(1, 2, cbar_mode='each')
     assert len(axes) == 2
     assert len(axes) == len(caxes)
     plt.close(fig)
 
 
-def test_facets_cbar_mode_invalid():
+def test_faceted_cbar_mode_invalid():
     with pytest.raises(ValueError):
-        facets(1, 2, cbar_mode='invalid')
+        faceted(1, 2, cbar_mode='invalid')
 
 
-def test_facets_invalid_internal_pad():
+def test_faceted_invalid_internal_pad():
     with pytest.raises(ValueError):
-        facets(1, 2, internal_pad=(1, 2, 3))
+        faceted(1, 2, internal_pad=(1, 2, 3))
 
 
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
@@ -517,7 +517,7 @@ def test_cartopy():
     import cartopy.crs as ccrs
     from cartopy.mpl.geoaxes import GeoAxes
 
-    fig, axes = facets(2, 2, axes_kwargs={'projection': ccrs.PlateCarree()})
+    fig, axes = faceted(2, 2, axes_kwargs={'projection': ccrs.PlateCarree()})
     for ax in axes:
         assert isinstance(ax, GeoAxes)
     plt.close(fig)

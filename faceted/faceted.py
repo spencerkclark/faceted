@@ -6,12 +6,12 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
-def facets(rows, cols, width=8., aspect=0.618, top_pad=0.25,
-           bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
-           cbar_mode=None, cbar_short_side_pad=0.5, cbar_pad=0.5,
-           cbar_size=0.125, cbar_location='right', sharex='all', sharey='all',
-           axes_kwargs={}):
-    """Create figure and tiled axes objects with precise attributes
+def faceted(rows, cols, width=8., aspect=0.618, top_pad=0.25,
+            bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
+            cbar_mode=None, cbar_short_side_pad=0.5, cbar_pad=0.5,
+            cbar_size=0.125, cbar_location='right', sharex='all', sharey='all',
+            axes_kwargs={}):
+    """Create figure and tiled axes objects with precise attributes.
 
     Parameters
     ----------
