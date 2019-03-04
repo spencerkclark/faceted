@@ -22,7 +22,7 @@ context of your figure size).
 
 
 setuptools.setup(
-    name='facets',
+    name='faceted',
     version='0.1',
     packages=setuptools.find_packages(),
     author='Spencer K. Clark',
@@ -31,6 +31,5 @@ setuptools.setup(
     install_requires=[
         'matplotlib >= 1.5',
         'numpy >= 1.7',
-    ],
-    scripts=['facets/examples/examples.ipynb']
+    ]
 )
