@@ -1,2 +1,2 @@
 [run]
-omit = faceted/tests/*, faceted/_version.py
+omit = faceted/tests/*, faceted/_version.py, versioneer.py
