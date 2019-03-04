@@ -1,0 +1,14 @@
+name: faceted-docs
+channels:
+    - conda-forge
+dependencies:
+    - python=3.6
+    - cartopy
+    - jupyter
+    - matplotlib
+    - numpy
+    - pytest
+    - pip:
+      - coveralls
+      - pytest-cov
+      - git+git://github.com/pydata/xarray.git
