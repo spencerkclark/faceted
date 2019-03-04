@@ -35,6 +35,10 @@ else:
 
 print("faceted: %s, %s" % (faceted.__version__, faceted.__file__))
 
+with suppress(ImportError):
+    import matplotlib
+    matplotlib.use('Agg')
+
 # with suppress(ImportError):
 #     import matplotlib
 #     matplotlib.use('Agg')

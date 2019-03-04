@@ -9,6 +9,7 @@ one of these solutions, e.g.
 
 .. ipython:: python
     :okwarning:
+
     import xarray as xr
     import matplotlib.pyplot as plt
 
@@ -110,6 +111,7 @@ Writing this all out in code gives:
 If we use these values when plotting we get:
     
 .. ipython:: python
+    :okwarning:
 
     fig, axes = plt.subplots(1, 3, figsize=(w, 4), sharey=True)
     
@@ -183,6 +185,7 @@ between panel spacing in this dimension, but we'll include the
     bottom = p_bottom / h
 
 .. ipython:: python
+    :okwarning:
 
     fig, axes = plt.subplots(1, 3, figsize=(w, h), sharey=True)
     
@@ -191,7 +194,7 @@ between panel spacing in this dimension, but we'll include the
               ax=ax, add_colorbar=False, vmin=-30, vmax=30)
     fig.subplots_adjust(left=left, right=right, wspace=wspace, top=top, bottom=bottom)
     
-    @savefig example_tair_adjusted13.png
+    @savefig example_tair_adjusted_cbar.png
     fig.colorbar(c, ax=axes.ravel().tolist(), orientation='horizontal',
         label='Air temperature', fraction=fraction, pad=pad, aspect=cbar_aspect);   
         
@@ -239,6 +242,7 @@ parameters:
 
 .. ipython:: python
     :okwarning:
+
     import cartopy.crs as ccrs
 
     ds = xr.tutorial.load_dataset('rasm').isel(time=slice(0, 3))
@@ -254,7 +258,7 @@ parameters:
 
     fig.subplots_adjust(left=left, right=right, wspace=wspace, top=top, bottom=bottom)
     
-    @savefig example_tair_adjusted71.png
+    @savefig example_tair_adjusted_cartopy.png
     fig.colorbar(c, ax=axes.ravel().tolist(), orientation='horizontal',
         label='Air temperature', fraction=fraction, pad=pad, aspect=cbar_aspect);
 
@@ -280,6 +284,7 @@ or post-hoc adjustment of the axes placement; everything gets handled in the
 top-level function.
 
 .. ipython:: python
+    :okwarning:
 
     from faceted import faceted
 
@@ -298,7 +303,7 @@ top-level function.
           ax.coastlines()
           ax.set_extent([-180, 180, 15, 90], crs=ccrs.PlateCarree())
 
-     @savefig example_tair_faceted2.png     
+     @savefig example_tair_faceted.png     
      plt.colorbar(c, cax=cax, orientation='horizontal',
                   label='Air temperature');
 

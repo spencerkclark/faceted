@@ -8,6 +8,8 @@ matrix:
     include:
     - python: 3.6
       env: CONDA_ENV=py36
+    - python: 3.6
+      env: CONDA_ENV=docs
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -23,11 +25,22 @@ before_install:
   - conda info -a
 
 install:
-  - conda env create --file ci/environment-$CONDA_ENV.yml
+  - if [[ "$CONDA_ENV" == "docs" ]]; then
+      conda env create -n test_env --file doc/environment.yml;
+    else
+      conda env create --file ci/environment-$CONDA_ENV.yml;
+    fi
   - source activate test_env
   - pip install -e .
 
 script:
-  - py.test faceted --cov=faceted --cov-report term-missing --verbose
+  - which python
+  - python --version
+  - if [[ "$CONDA_ENV" == "docs" ]]; then
+      cd doc;
+      sphinx-build -n -j auto -b html -d _build/doctrees . _build/html;
+    else
+      py.test faceted --cov=faceted --cov-report term-missing --verbose;
+    fi
 after_success:
   - coveralls
