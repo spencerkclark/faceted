@@ -9,6 +9,7 @@ one of these solutions, e.g.
 
 .. ipython:: python
     :okwarning:
+
     import xarray as xr
     import matplotlib.pyplot as plt
 
@@ -110,6 +111,7 @@ Writing this all out in code gives:
 If we use these values when plotting we get:
     
 .. ipython:: python
+    :okwarning:
 
     fig, axes = plt.subplots(1, 3, figsize=(w, 4), sharey=True)
     
@@ -183,6 +185,7 @@ between panel spacing in this dimension, but we'll include the
     bottom = p_bottom / h
 
 .. ipython:: python
+    :okwarning:
 
     fig, axes = plt.subplots(1, 3, figsize=(w, h), sharey=True)
     
@@ -239,6 +242,7 @@ parameters:
 
 .. ipython:: python
     :okwarning:
+
     import cartopy.crs as ccrs
 
     ds = xr.tutorial.load_dataset('rasm').isel(time=slice(0, 3))
@@ -280,6 +284,7 @@ or post-hoc adjustment of the axes placement; everything gets handled in the
 top-level function.
 
 .. ipython:: python
+    :okwarning:
 
     from faceted import faceted
 

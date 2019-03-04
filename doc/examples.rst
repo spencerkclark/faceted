@@ -6,6 +6,7 @@ different features.  Using it in many ways resembles using ``plt.subplots``.
 
 .. ipython:: python
     :okwarning:
+
     import matplotlib.pyplot as plt
     import xarray as xr
     from faceted import faceted
@@ -36,6 +37,7 @@ make room for the outer axes labels, while maintaining our prescribed figure
 width. 
 
 .. ipython:: python
+    :okwarning:
 
     fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.75,
                         internal_pad=(0.33, 0.66))
@@ -57,6 +59,7 @@ different.  Making use of the xarray tutorial dataset, we can plot an anomaly
 from the time mean at each location in the lower row instead.
 
 .. ipython:: python
+    :okwarning:
 
     import numpy as np
              
@@ -103,6 +106,7 @@ a figure.
 
 .. ipython:: python
     :okwarning:
+
     import cartopy.crs as ccrs
 
     ds = xr.tutorial.load_dataset('rasm')
@@ -135,7 +139,8 @@ Edge colorbars are useful when rows or columns of a figure share a colorbar.
 We'll show an example where the rows share a colorbar.
 
 .. ipython:: python
-             
+    :okwarning:
+
     aspect = 75. / 180.
     fig, axes, (cax1, cax2) = faceted(2, 3, width=8, aspect=aspect, right_pad=0.75,
                                       cbar_mode='edge',
@@ -176,6 +181,7 @@ One more common use case is a colorbar for each panel.  This can be done by
 specifying ``cbar_mode='each'`` as an argument in the call to ``faceted``.
 
 .. ipython:: python
+    :okwarning:
 
     from matplotlib import ticker
     tick_locator = ticker.MaxNLocator(nbins=3)
