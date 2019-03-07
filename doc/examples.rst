@@ -1,16 +1,20 @@
 Using faceted
 =============
 
-``faceted`` is quite flexible.  Here are a couple of examples illustrating the
-different features.  Using it in many ways resembles using ``plt.subplots``.
+:py:meth:`faceted.faceted` is quite flexible.  Here are a couple of examples
+illustrating the different features.  Using it in many ways resembles using
+:py:meth:`matplotlib.pyplot.subplots`. 
 
 .. ipython:: python
     :okwarning:
 
     import matplotlib.pyplot as plt
     import xarray as xr
+    from matplotlib import ticker
     from faceted import faceted
 
+    tick_locator = ticker.MaxNLocator(nbins=3)
+    
     ds = xr.tutorial.load_dataset('rasm').isel(x=slice(30, 37), y=-1,
                                                time=slice(0, 11))
     temp = ds.Tair
@@ -21,6 +25,7 @@ different features.  Using it in many ways resembles using ``plt.subplots``.
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
         ax.set_xlabel('Time')
         ax.set_ylabel('Temperature [C]')
+        ax.tick_params(axis='x', labelrotation=45)
 
     @savefig example_tair_base.png
     fig.show()
@@ -39,13 +44,14 @@ width.
 .. ipython:: python
     :okwarning:
 
-    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.75,
+    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.9,
                         internal_pad=(0.33, 0.66))
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
         ax.set_xlabel('Time')
         ax.set_ylabel('Temperature [C]')
+        ax.tick_params(axis='x', labelrotation=45)
 
     @savefig example_tair_padding.png
     fig.show()
@@ -69,7 +75,7 @@ from the time mean at each location in the lower row instead.
     mean = (ds.Tair * time_weights).sum('time') / time_weights.where(np.isfinite(ds.Tair)).sum('time')
     anomaly = ds.Tair - mean
     
-    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.75,
+    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.9,
                         internal_pad=(0.33, 0.66), sharey='row')
     for i, ax in enumerate(axes[:3]):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
@@ -82,6 +88,7 @@ from the time mean at each location in the lower row instead.
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
         ax.set_xlabel('Time')
         ax.set_ylabel('Anomaly [C]')
+        ax.tick_params(axis='x', labelrotation=45)
         
     @savefig example_tair_share_axes.png
     fig.show()    
@@ -90,13 +97,13 @@ Colorbar modes and locations
 ----------------------------
 
 Let's say we are plotting 2D data in the form of pcolormesh plots that require
-a colorbar.  ``faceted`` comes with a number of options for placing and sizing
+a colorbar.  :py:meth:`faceted.faceted` comes with a number of options for placing and sizing
 colorbars in a paneled figure.  We can add a colorbar to a figure by modifying
 the ``cbar_mode`` argument; by default it is set to ``None``, meaning no
 colorbar, as in the plots above.  For all of the examples here, we'll just plot
 a time series of maps.  Since the xarray tutorial data is geographic in nature,
-we'll also use this opportunity to show how to use ``cartopy`` with
-``faceted``.
+we'll also use this opportunity to show how to use :py:mod:`cartopy` with
+:py:meth:`faceted.faceted`.
 
 Single colorbar
 ###############
@@ -178,12 +185,11 @@ Colorbars for each panel
 ########################
 
 One more common use case is a colorbar for each panel.  This can be done by
-specifying ``cbar_mode='each'`` as an argument in the call to ``faceted``.
+specifying ``cbar_mode='each'`` as an argument in the call to :py:meth:`faceted.faceted`.
 
 .. ipython:: python
     :okwarning:
 
-    from matplotlib import ticker
     tick_locator = ticker.MaxNLocator(nbins=3)
     
     aspect = 75. / 180.
@@ -212,7 +218,7 @@ specifying ``cbar_mode='each'`` as an argument in the call to ``faceted``.
 Parameter defintions
 --------------------
 
-A full summary of the meanings of the different arguments to ``faceted`` can be
+A full summary of the meanings of the different arguments to :py:meth:`faceted.faceted` can be
 found here.  
 
 Parameters controlling figure and axes dimensions
