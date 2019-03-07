@@ -62,8 +62,8 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
 ]
 
-extlinks = {'issue': ('https://github.com/pydata/faceted/issues/%s', 'GH'),
-            'pull': ('https://github.com/pydata/faceted/pull/%s', 'PR')}
+extlinks = {'issue': ('https://github.com/spencerkclark/faceted/issues/%s', 'GH'),
+            'pull': ('https://github.com/spencerkclark/faceted/pull/%s', 'PR')}
 
 autosummary_generate = True
 

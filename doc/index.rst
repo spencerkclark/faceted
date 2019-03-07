@@ -35,7 +35,11 @@ use.
 Installation
 ------------
 
-Currently the only option for installing ``faceted`` is from source::
+You can install :py:mod:`faceted` from PyPI::
+
+  $ pip install faceted
+
+or directly from source::
 
   $ git clone https://github.com/spencerkclark/faceted.git
   $ cd faceted
