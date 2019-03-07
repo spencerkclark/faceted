@@ -47,6 +47,7 @@ Currently the only option for installing ``faceted`` is from source::
 Documentation
 -------------
 
+* :doc:`whats-new`
 * :doc:`why-faceted`
 * :doc:`examples`
 * :doc:`api`
@@ -55,6 +56,7 @@ Documentation
    :maxdepth: 1
    :hidden:
 
+   whats-new
    why-faceted
    examples
    api
