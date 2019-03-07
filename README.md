@@ -39,8 +39,11 @@ https://faceted.readthedocs.io/en/latest/.
 Installation
 ------------
 
-Currently, the only way to install `faceted` is directly from the source.  You
-can do so using `pip`:
+You can install `faceted` either from PyPI:
+```
+$ pip install faceted
+```
+or directly from source:
 ```
 $ git clone https://github.com/spencerkclark/faceted.git
 $ cd faceted
