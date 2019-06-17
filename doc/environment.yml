@@ -3,7 +3,7 @@ channels:
     - conda-forge
 dependencies:
     - python=3.6
-    - cartopy=0.15.1
+    - cartopy=0.17.0
     - jupyter
     - matplotlib
     - nc-time-axis
@@ -16,7 +16,7 @@ dependencies:
     - sphinx-gallery=0.2.0
     - sphinx_rtd_theme=0.4.2
     - netCDF4=1.4.2
+    - xarray
     - pip:
       - coveralls
       - pytest-cov
-      - git+git://github.com/pydata/xarray.git
