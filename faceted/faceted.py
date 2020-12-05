@@ -6,11 +6,26 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
-def faceted(rows, cols, width=None, height=None, aspect=None, top_pad=0.25,
-            bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
-            cbar_mode=None, cbar_short_side_pad=0.0, cbar_pad=0.5,
-            cbar_size=0.125, cbar_location='right', sharex='all', sharey='all',
-            axes_kwargs=None):
+def faceted(
+    rows,
+    cols,
+    width=None,
+    height=None,
+    aspect=None,
+    top_pad=0.25,
+    bottom_pad=0.25,
+    left_pad=0.25,
+    right_pad=0.25,
+    internal_pad=0.33,
+    cbar_mode=None,
+    cbar_short_side_pad=0.0,
+    cbar_pad=0.5,
+    cbar_size=0.125,
+    cbar_location="right",
+    sharex="all",
+    sharey="all",
+    axes_kwargs=None,
+):
     """Create figure and tiled axes objects with precise attributes.
 
     Exactly two of width, height, and aspect must be defined.  The third is
@@ -67,29 +82,43 @@ def faceted(rows, cols, width=None, height=None, aspect=None, top_pad=0.25,
     if isinstance(internal_pad, (float, int)):
         internal_pad = (internal_pad, internal_pad)
     if len(internal_pad) != 2:
-        raise ValueError('Invalid internal pad provided; it must either be a '
-                         'float or a sequence of two values.  Got '
-                         '{}'.format(internal_pad))
-    if cbar_mode not in [None, 'single', 'edge', 'each']:
-        raise ValueError(f'Invalid cbar mode provided.  Got {cbar_mode}.')
+        raise ValueError(
+            "Invalid internal pad provided; it must either be a "
+            "float or a sequence of two values.  Got "
+            "{}".format(internal_pad)
+        )
+    if cbar_mode not in [None, "single", "edge", "each"]:
+        raise ValueError(f"Invalid cbar mode provided.  Got {cbar_mode}.")
 
     grid_class = _infer_grid_class(width, height, aspect)
     grid = grid_class(
-            rows, cols, width=width, height=height, aspect=aspect, top_pad=top_pad,
-            bottom_pad=bottom_pad, left_pad=left_pad, right_pad=right_pad,
-            cbar_mode=cbar_mode, cbar_location=cbar_location, cbar_pad=cbar_pad,
-            cbar_size=cbar_size, cbar_short_side_pad=cbar_short_side_pad,
-            axes_pad=internal_pad, sharex=sharex, sharey=sharey,
-            axes_kwargs=axes_kwargs
-        )
+        rows,
+        cols,
+        width=width,
+        height=height,
+        aspect=aspect,
+        top_pad=top_pad,
+        bottom_pad=bottom_pad,
+        left_pad=left_pad,
+        right_pad=right_pad,
+        cbar_mode=cbar_mode,
+        cbar_location=cbar_location,
+        cbar_pad=cbar_pad,
+        cbar_size=cbar_size,
+        cbar_short_side_pad=cbar_short_side_pad,
+        axes_pad=internal_pad,
+        sharex=sharex,
+        sharey=sharey,
+        axes_kwargs=axes_kwargs,
+    )
     if cbar_mode is None:
         return grid.fig, grid.axes
-    elif cbar_mode in ['each', 'edge', 'single']:
+    elif cbar_mode in ["each", "edge", "single"]:
         return grid.fig, grid.axes, grid.caxes
 
 
-_LR = ['left', 'right']
-_BT = ['bottom', 'top']
+_LR = ["left", "right"]
+_BT = ["bottom", "top"]
 
 
 def _assert_valid_constraint(width, height, aspect):
@@ -111,6 +140,7 @@ def _infer_grid_class(width, height, aspect):
 class CbarShortSidePadMixin(object):
     """Methods to redraw colorbar Axes created in AxesGrid, allowing for
     customization of their length."""
+
     def resize_colorbar(self, cax):
         """Add a short-side pad to a given AxesGrid colorbar"""
         locator = cax.get_axes_locator()
@@ -122,12 +152,15 @@ class CbarShortSidePadMixin(object):
     def resize_colorbars(self):
         """Depending on the cbar_mode resize colorbar(s) to accomodate
         short-side pad option"""
-        if self.cbar_mode == 'each':
+        if self.cbar_mode == "each":
             return [self.resize_colorbar(cax) for cax in self.grid.cbar_axes]
-        elif self.cbar_mode == 'edge':
-            return [self.resize_colorbar(cax) for cax in self.grid.cbar_axes
-                    if cax.get_axes_locator() is not None]
-        elif self.cbar_mode == 'single':
+        elif self.cbar_mode == "edge":
+            return [
+                self.resize_colorbar(cax)
+                for cax in self.grid.cbar_axes
+                if cax.get_axes_locator() is not None
+            ]
+        elif self.cbar_mode == "single":
             return self.resize_colorbar(self.grid.cbar_axes[0])
         else:
             return None
@@ -137,15 +170,14 @@ class CbarShortSidePadMixin(object):
         if self.cbar_location in _BT:
             x0 = position.x0 + self.cbar_short_side_pad / self.width
             y0 = position.y0
-            width = position.width - 2. * self.cbar_short_side_pad / self.width
+            width = position.width - 2.0 * self.cbar_short_side_pad / self.width
             height = position.height
             return [x0, y0, width, height]
         elif self.cbar_location in _LR:
             x0 = position.x0
             y0 = position.y0 + self.cbar_short_side_pad / self.height
             width = position.width
-            height = (position.height -
-                      2. * self.cbar_short_side_pad / self.height)
+            height = position.height - 2.0 * self.cbar_short_side_pad / self.height
             return [x0, y0, width, height]
 
 
@@ -156,11 +188,12 @@ class ShareAxesMixin(object):
     custom keyword arguments to the Axes constructor (e.g. this allows one to
     pass a cartopy projection).
     """
+
     @property
     def sharex(self):
         """The sharex mode of the object."""
         if isinstance(self._sharex, bool):
-            result = 'all' if self._sharex else 'none'
+            result = "all" if self._sharex else "none"
         else:
             result = self._sharex
         return result
@@ -169,7 +202,7 @@ class ShareAxesMixin(object):
     def sharey(self):
         """The sharey mode of the object"""
         if isinstance(self._sharey, bool):
-            result = 'all' if self._sharey else 'none'
+            result = "all" if self._sharey else "none"
         else:
             result = self._sharey
         return result
@@ -180,8 +213,7 @@ class ShareAxesMixin(object):
         locator = ax.get_axes_locator()
         position = locator(ax, None)
         ax.set_visible(False)
-        return self.fig.add_axes(position, sharex=sharex, sharey=sharey,
-                                 **axes_kwargs)
+        return self.fig.add_axes(position, sharex=sharex, sharey=sharey, **axes_kwargs)
 
     def redraw_axes(self):
         """Redraw all Axes objects created in AxesGrid with appropriate shared
@@ -193,26 +225,27 @@ class ShareAxesMixin(object):
         axes = []
         rows_cols = product(range(self.rows), range(self.cols))
         for ax, (row, col) in zip(self.grid.axes_all, rows_cols):
-            if self.sharex == 'all':
+            if self.sharex == "all":
                 sharex = all_ref
-            elif self.sharex == 'col':
+            elif self.sharex == "col":
                 sharex = col_ref_axes[col]
-            elif self.sharex == 'row':
+            elif self.sharex == "row":
                 sharex = row_ref_axes[row]
             else:
                 sharex = None
 
-            if self.sharey == 'all':
+            if self.sharey == "all":
                 sharey = all_ref
-            elif self.sharey == 'col':
+            elif self.sharey == "col":
                 sharey = col_ref_axes[col]
-            elif self.sharey == 'row':
+            elif self.sharey == "row":
                 sharey = row_ref_axes[row]
             else:
                 sharey = None
 
-            new = self.redraw_ax(ax, sharex=sharex, sharey=sharey,
-                                 axes_kwargs=self.axes_kwargs)
+            new = self.redraw_ax(
+                ax, sharex=sharex, sharey=sharey, axes_kwargs=self.axes_kwargs
+            )
             axes.append(new)
             all_ref = new
             col_ref_axes[col] = new
@@ -223,23 +256,41 @@ class ShareAxesMixin(object):
     def make_shared_ticklabels_invisible(self):
         """Make inner Axes tick labels of shared Axes invisible."""
         axes = np.reshape(self.axes, (self.rows, self.cols))
-        if self.sharex in ['col', 'all']:
+        if self.sharex in ["col", "all"]:
             for ax in axes[:-1, :].flatten():
-                ax.xaxis.set_tick_params(which='both', labelbottom=False,
-                                         labeltop=False)
+                ax.xaxis.set_tick_params(
+                    which="both", labelbottom=False, labeltop=False
+                )
 
-        if self.sharey in ['row', 'all']:
+        if self.sharey in ["row", "all"]:
             for ax in axes[:, 1:].flatten():
-                ax.yaxis.set_tick_params(which='both', labelbottom=False,
-                                         labeltop=False)
+                ax.yaxis.set_tick_params(
+                    which="both", labelbottom=False, labeltop=False
+                )
 
 
 class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
-    def __init__(self, rows, cols, width=None, height=None, aspect=None, top_pad=0., bottom_pad=0.,
-                 left_pad=0., right_pad=0., cbar_size=0.125,
-                 cbar_pad=0.125, axes_pad=(0.2, 0.2), cbar_mode=None,
-                 cbar_location='bottom', cbar_short_side_pad=0.,
-                 sharex=False, sharey=False, axes_kwargs=None):
+    def __init__(
+        self,
+        rows,
+        cols,
+        width=None,
+        height=None,
+        aspect=None,
+        top_pad=0.0,
+        bottom_pad=0.0,
+        left_pad=0.0,
+        right_pad=0.0,
+        cbar_size=0.125,
+        cbar_pad=0.125,
+        axes_pad=(0.2, 0.2),
+        cbar_mode=None,
+        cbar_location="bottom",
+        cbar_short_side_pad=0.0,
+        sharex=False,
+        sharey=False,
+        axes_kwargs=None,
+    ):
         self.rows = rows
         self.cols = cols
         self._width = width
@@ -272,10 +323,15 @@ class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
     def construct_axes(self):
         self.fig = plt.figure()
         self.grid = AxesGrid(
-            self.fig, self.rect, nrows_ncols=(self.rows, self.cols),
-            cbar_size=self.cbar_size, cbar_pad=self.axes_grid_cbar_pad,
-            axes_pad=self.axes_pad, cbar_mode=self.cbar_mode,
-            cbar_location=self.cbar_location, aspect=False
+            self.fig,
+            self.rect,
+            nrows_ncols=(self.rows, self.cols),
+            cbar_size=self.cbar_size,
+            cbar_pad=self.axes_grid_cbar_pad,
+            axes_pad=self.axes_pad,
+            cbar_mode=self.cbar_mode,
+            cbar_location=self.cbar_location,
+            aspect=False,
         )
         self.fig.set_size_inches(self.width, self.height)
         self.axes = self.redraw_axes()
@@ -290,9 +346,9 @@ class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         here.
         """
         horizontal_pad, vertical_pad = self.axes_pad
-        if self.cbar_location == 'bottom' and self.cbar_mode == 'single':
+        if self.cbar_location == "bottom" and self.cbar_mode == "single":
             return self.cbar_pad - vertical_pad
-        elif self.cbar_location == 'left' and self.cbar_mode == 'single':
+        elif self.cbar_location == "left" and self.cbar_mode == "single":
             return self.cbar_pad - horizontal_pad
         else:
             return self.cbar_pad
@@ -307,10 +363,13 @@ class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         return [x0, y0, width, height]
 
 
-class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
+class WidthConstrainedAxesGrid(
+    ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin
+):
     """An AxesGrid object with a figure constrained to a precise width
     with panels with a prescribed aspect ratio.
     """
+
     @property
     def plot_width(self):
         """Width of plot area in each panel (in inches)"""
@@ -321,11 +380,11 @@ class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Share
 
         if self.cbar_mode is None or self.cbar_location in _BT:
             return (inner_width - inner_pad) / self.cols
-        elif self.cbar_mode == 'each' and self.cbar_location in _LR:
-            return (inner_width - inner_pad
-                    - self.cols * cbar_width) / self.cols
-        elif (self.cbar_mode == 'single' or
-              self.cbar_mode == 'edge') and self.cbar_location in _LR:
+        elif self.cbar_mode == "each" and self.cbar_location in _LR:
+            return (inner_width - inner_pad - self.cols * cbar_width) / self.cols
+        elif (
+            self.cbar_mode == "single" or self.cbar_mode == "edge"
+        ) and self.cbar_location in _LR:
             return (inner_width - inner_pad - cbar_width) / self.cols
 
     @property
@@ -354,19 +413,23 @@ class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Share
 
         if self.cbar_mode is None or self.cbar_location in _LR:
             return total_plot_height + total_axes_pad + outer_pad
-        elif self.cbar_mode == 'each' and self.cbar_location in _BT:
-            return (total_plot_height + total_axes_pad + outer_pad + self.rows
-                    * cbar_width)
-        elif (self.cbar_mode == 'single' or
-              self.cbar_mode == 'edge') and self.cbar_location in _BT:
-            return (total_plot_height + total_axes_pad + outer_pad +
-                    cbar_width)
+        elif self.cbar_mode == "each" and self.cbar_location in _BT:
+            return (
+                total_plot_height + total_axes_pad + outer_pad + self.rows * cbar_width
+            )
+        elif (
+            self.cbar_mode == "single" or self.cbar_mode == "edge"
+        ) and self.cbar_location in _BT:
+            return total_plot_height + total_axes_pad + outer_pad + cbar_width
 
 
-class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
+class HeightConstrainedAxesGrid(
+    ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin
+):
     """An AxesGrid object with a figure constrained to a precise height
     with panels with a prescribed aspect ratio.
     """
+
     @property
     def plot_height(self):
         """Height of plot area in each panel (in inches)"""
@@ -377,11 +440,11 @@ class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Shar
 
         if self.cbar_mode is None or self.cbar_location in _LR:
             return (inner_height - inner_pad) / self.rows
-        elif self.cbar_mode == 'each' and self.cbar_location in _BT:
-            return (inner_height - inner_pad
-                    - self.rows * cbar_width) / self.rows
-        elif (self.cbar_mode == 'single' or
-              self.cbar_mode == 'edge') and self.cbar_location in _BT:
+        elif self.cbar_mode == "each" and self.cbar_location in _BT:
+            return (inner_height - inner_pad - self.rows * cbar_width) / self.rows
+        elif (
+            self.cbar_mode == "single" or self.cbar_mode == "edge"
+        ) and self.cbar_location in _BT:
             return (inner_height - inner_pad - cbar_width) / self.rows
 
     @property
@@ -410,19 +473,23 @@ class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Shar
 
         if self.cbar_mode is None or self.cbar_location in _BT:
             return total_plot_width + total_axes_pad + outer_pad
-        elif self.cbar_mode == 'each' and self.cbar_location in _LR:
-            return (total_plot_width + total_axes_pad + outer_pad + self.cols
-                    * cbar_width)
-        elif (self.cbar_mode == 'single' or
-              self.cbar_mode == 'edge') and self.cbar_location in _LR:
-            return (total_plot_width + total_axes_pad + outer_pad +
-                    cbar_width)
+        elif self.cbar_mode == "each" and self.cbar_location in _LR:
+            return (
+                total_plot_width + total_axes_pad + outer_pad + self.cols * cbar_width
+            )
+        elif (
+            self.cbar_mode == "single" or self.cbar_mode == "edge"
+        ) and self.cbar_location in _LR:
+            return total_plot_width + total_axes_pad + outer_pad + cbar_width
 
 
-class HeightAndWidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
+class HeightAndWidthConstrainedAxesGrid(
+    ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin
+):
     """An AxesGrid object with a figure constrained to a precise height and width
     with panels with a flexible aspect ratio.
     """
+
     @property
     def plot_width(self):
         """Width of plot area in each panel (in inches)"""
@@ -433,11 +500,11 @@ class HeightAndWidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMix
 
         if self.cbar_mode is None or self.cbar_location in _BT:
             return (inner_width - inner_pad) / self.cols
-        elif self.cbar_mode == 'each' and self.cbar_location in _LR:
-            return (inner_width - inner_pad
-                    - self.cols * cbar_width) / self.cols
-        elif (self.cbar_mode == 'single' or
-              self.cbar_mode == 'edge') and self.cbar_location in _LR:
+        elif self.cbar_mode == "each" and self.cbar_location in _LR:
+            return (inner_width - inner_pad - self.cols * cbar_width) / self.cols
+        elif (
+            self.cbar_mode == "single" or self.cbar_mode == "edge"
+        ) and self.cbar_location in _LR:
             return (inner_width - inner_pad - cbar_width) / self.cols
 
     @property
@@ -450,11 +517,11 @@ class HeightAndWidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMix
 
         if self.cbar_mode is None or self.cbar_location in _LR:
             return (inner_height - inner_pad) / self.rows
-        elif self.cbar_mode == 'each' and self.cbar_location in _BT:
-            return (inner_height - inner_pad
-                    - self.rows * cbar_width) / self.rows
-        elif (self.cbar_mode == 'single' or
-              self.cbar_mode == 'edge') and self.cbar_location in _BT:
+        elif self.cbar_mode == "each" and self.cbar_location in _BT:
+            return (inner_height - inner_pad - self.rows * cbar_width) / self.rows
+        elif (
+            self.cbar_mode == "single" or self.cbar_mode == "edge"
+        ) and self.cbar_location in _BT:
             return (inner_height - inner_pad - cbar_width) / self.rows
 
     @property
