@@ -68,7 +68,7 @@ def test__infer_grid_class(width, height, aspect, expected):
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
 _CBAR_MODES = [None, 'single', 'each', 'edge']
 _CBAR_LOCATIONS = ['bottom', 'right', 'top', 'left']
-_CONSTRAINTS = ['height', 'width', 'height-and-width']
+_CONSTRAINTS = ['height-and-aspect', 'width-and-aspect', 'height-and-width']
 _CG_LAYOUTS = product(_CBAR_MODES, _CBAR_LOCATIONS, _LAYOUTS, _CONSTRAINTS)
 
 
@@ -85,7 +85,7 @@ _CG_IDS = OrderedDict([(layout, format_layout(layout))
 @pytest.fixture(params=_CG_IDS.keys(), ids=_CG_IDS.values())
 def grid(request):
     mode, location, (rows, cols), constraint = request.param
-    if constraint == 'width':
+    if constraint == 'width-and-aspect':
         obj = WidthConstrainedAxesGrid(
             rows, cols, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT,
             top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
@@ -94,7 +94,7 @@ def grid(request):
             axes_pad=_INTERNAL_PAD, cbar_location=location,
             cbar_size=_CBAR_THICKNESS,
             cbar_short_side_pad=_SHORT_SIDE_PAD)
-    elif constraint == 'height':
+    elif constraint == 'height-and-aspect':
         obj = HeightConstrainedAxesGrid(
             rows, cols, height=_HEIGHT_CONSTRAINT, aspect=_ASPECT_CONSTRAINT,
             top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,

@@ -1,8 +1,8 @@
 faceted
 =======
 
-Figures with precise control over overall width, plot aspect ratio,
-between-plot spacing, and colorbar dimensions.
+Figures with precise control over overall width, overall height,
+plot aspect ratio, between-plot spacing, and colorbar dimensions.
 
 .. image:: example_tair_edge_cbar.png
 
