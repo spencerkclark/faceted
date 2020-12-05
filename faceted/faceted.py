@@ -70,6 +70,8 @@ def faceted(rows, cols, width=None, height=None, aspect=None, top_pad=0.25,
         raise ValueError('Invalid internal pad provided; it must either be a '
                          'float or a sequence of two values.  Got '
                          '{}'.format(internal_pad))
+    if cbar_mode not in [None, 'single', 'edge', 'each']:
+        raise ValueError(f'Invalid cbar mode provided.  Got {cbar_mode}.')
 
     grid_class = _infer_grid_class(width, height, aspect)
     grid = grid_class(
@@ -325,8 +327,6 @@ class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Share
         elif (self.cbar_mode == 'single' or
               self.cbar_mode == 'edge') and self.cbar_location in _LR:
             return (inner_width - inner_pad - cbar_width) / self.cols
-        else:
-            raise ValueError('Invalid cbar_mode or cbar_location provided')
 
     @property
     def plot_height(self):
@@ -383,8 +383,6 @@ class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Shar
         elif (self.cbar_mode == 'single' or
               self.cbar_mode == 'edge') and self.cbar_location in _BT:
             return (inner_height - inner_pad - cbar_width) / self.rows
-        else:
-            raise ValueError('Invalid cbar_mode or cbar_location provided')
 
     @property
     def plot_width(self):
@@ -441,8 +439,6 @@ class HeightAndWidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMix
         elif (self.cbar_mode == 'single' or
               self.cbar_mode == 'edge') and self.cbar_location in _LR:
             return (inner_width - inner_pad - cbar_width) / self.cols
-        else:
-            raise ValueError('Invalid cbar_mode or cbar_location provided')
 
     @property
     def plot_height(self):
@@ -460,8 +456,6 @@ class HeightAndWidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMix
         elif (self.cbar_mode == 'single' or
               self.cbar_mode == 'edge') and self.cbar_location in _BT:
             return (inner_height - inner_pad - cbar_width) / self.rows
-        else:
-            raise ValueError('Invalid cbar_mode or cbar_location provided')
 
     @property
     def height(self):
