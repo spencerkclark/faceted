@@ -380,28 +380,29 @@ def check_width_constrained_caxes_positions_edge(grid):
 
 def shared_grid(sharex, sharey):
     return WidthConstrainedAxesGrid(
-        2, 2, _WIDTH_CONSTRAINT, sharex=sharex, sharey=sharey,
+        2, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT, sharex=sharex, sharey=sharey,
         cbar_mode='single')
 
 
 def assert_visible_xticklabels(ax):
-    assert ax.xaxis._get_tick(ax.xaxis.major).label1On
-    assert ax.xaxis._get_tick(ax.xaxis.minor).label1On
+    assert ax.xaxis._get_tick(ax.xaxis.major).label1.get_visible()
+    assert ax.xaxis._get_tick(ax.xaxis.minor).label1.get_visible()
 
 
 def assert_invisible_xticklabels(ax):
-    assert not ax.xaxis._get_tick(ax.xaxis.major).label1On
-    assert not ax.xaxis._get_tick(ax.xaxis.minor).label1On
+    print(dir(ax.xaxis._get_tick(ax.xaxis.major)))
+    assert not ax.xaxis._get_tick(ax.xaxis.major).label1.get_visible()
+    assert not ax.xaxis._get_tick(ax.xaxis.minor).label1.get_visible()
 
 
 def assert_visible_yticklabels(ax):
-    assert ax.yaxis._get_tick(ax.yaxis.major).label1On
-    assert ax.yaxis._get_tick(ax.yaxis.minor).label1On
+    assert ax.yaxis._get_tick(ax.yaxis.major).label1.get_visible()
+    assert ax.yaxis._get_tick(ax.yaxis.minor).label1.get_visible()
 
 
 def assert_invisible_yticklabels(ax):
-    assert not ax.yaxis._get_tick(ax.yaxis.major).label1On
-    assert not ax.yaxis._get_tick(ax.yaxis.minor).label1On
+    assert not ax.yaxis._get_tick(ax.yaxis.major).label1.get_visible()
+    assert not ax.yaxis._get_tick(ax.yaxis.minor).label1.get_visible()
 
 
 def assert_valid_x_sharing(shared_grid, sharex):

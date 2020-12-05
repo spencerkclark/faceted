@@ -6,11 +6,11 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
-def faceted(rows, cols, width=8., aspect=0.618, top_pad=0.25,
+def faceted(rows, cols, width=8., height=None, aspect=0.618, top_pad=0.25,
             bottom_pad=0.25, left_pad=0.25, right_pad=0.25, internal_pad=0.33,
             cbar_mode=None, cbar_short_side_pad=0.0, cbar_pad=0.5,
             cbar_size=0.125, cbar_location='right', sharex='all', sharey='all',
-            axes_kwargs={}):
+            axes_kwargs=None):
     """Create figure and tiled axes objects with precise attributes.
 
     Parameters
@@ -21,6 +21,8 @@ def faceted(rows, cols, width=8., aspect=0.618, top_pad=0.25,
         Number of columns of tiles in figure
     width : float
         Width of figure
+    height : float
+        Height of figure
     aspect : float
         Aspect ratio of plots in each tile
     top_pad : float
@@ -66,14 +68,15 @@ def faceted(rows, cols, width=8., aspect=0.618, top_pad=0.25,
                          'float or a sequence of two values.  Got '
                          '{}'.format(internal_pad))
 
-    grid = WidthConstrainedAxesGrid(
-        rows, cols, width=width, aspect=aspect, top_pad=top_pad,
-        bottom_pad=bottom_pad, left_pad=left_pad, right_pad=right_pad,
-        cbar_mode=cbar_mode, cbar_location=cbar_location, cbar_pad=cbar_pad,
-        cbar_size=cbar_size, cbar_short_side_pad=cbar_short_side_pad,
-        axes_pad=internal_pad, sharex=sharex, sharey=sharey,
-        axes_kwargs=axes_kwargs
-    )
+    grid_class = _infer_grid_class(width, height, aspect)
+    grid = grid_class(
+            rows, cols, width=width, height=height, aspect=aspect, top_pad=top_pad,
+            bottom_pad=bottom_pad, left_pad=left_pad, right_pad=right_pad,
+            cbar_mode=cbar_mode, cbar_location=cbar_location, cbar_pad=cbar_pad,
+            cbar_size=cbar_size, cbar_short_side_pad=cbar_short_side_pad,
+            axes_pad=internal_pad, sharex=sharex, sharey=sharey,
+            axes_kwargs=axes_kwargs
+        )
     if cbar_mode is None:
         return grid.fig, grid.axes
     elif cbar_mode in ['each', 'edge', 'single']:
@@ -82,6 +85,22 @@ def faceted(rows, cols, width=8., aspect=0.618, top_pad=0.25,
 
 _LR = ['left', 'right']
 _BT = ['bottom', 'top']
+
+
+def _assert_valid_constraint(width, height, aspect):
+    constraints = (width, height, aspect)
+    if not (sum(constraint is not None for constraint in constraints) == 2):
+        raise ValueError("Exactly two of width, height, and aspect must be floats")
+
+
+def _infer_grid_class(width, height, aspect):
+    _assert_valid_constraint(width, height, aspect)
+    if width is not None and aspect is not None:
+        return WidthConstrainedAxesGrid
+    elif height is not None and aspect is not None:
+        return HeightConstrainedAxesGrid
+    else:
+        raise NotImplementedError()
 
 
 class CbarShortSidePadMixin(object):
@@ -210,19 +229,17 @@ class ShareAxesMixin(object):
                                          labeltop=False)
 
 
-class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
-    """An AxesGrid object with a figure constrained to a precise width
-    with panels with a prescribed aspect ratio.
-    """
-    def __init__(self, rows, cols, width, top_pad=0., bottom_pad=0.,
+class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
+    def __init__(self, rows, cols, width=None, height=None, aspect=None, top_pad=0., bottom_pad=0.,
                  left_pad=0., right_pad=0., cbar_size=0.125,
                  cbar_pad=0.125, axes_pad=(0.2, 0.2), cbar_mode=None,
-                 cbar_location='bottom', aspect=0.5, cbar_short_side_pad=0.,
-                 sharex=False, sharey=False, axes_kwargs={}):
+                 cbar_location='bottom', cbar_short_side_pad=0.,
+                 sharex=False, sharey=False, axes_kwargs=None):
         self.rows = rows
         self.cols = cols
-        self.width = width
-        self.aspect = aspect
+        self._width = width
+        self._height = height
+        self._aspect = aspect
 
         self.axes_pad = axes_pad
 
@@ -235,27 +252,23 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         self.cbar_size = cbar_size
         self.cbar_pad = cbar_pad
         self.cbar_location = cbar_location
+        self.cbar_short_side_pad = cbar_short_side_pad
 
         self._sharex = sharex
         self._sharey = sharey
-        self.axes_kwargs = axes_kwargs
 
-        # For some reason when the colorbar is placed at the bottom or left
-        # and the colorbar mode is 'single', AxesGrid adds an extra
-        # axes pad to the colorbar padding; we correct this manually here.
-        if self.cbar_location == 'bottom' and self.cbar_mode == 'single':
-            axes_grid_cbar_pad = self.cbar_pad - self.axes_pad[1]
-        elif self.cbar_location == 'left' and self.cbar_mode == 'single':
-            axes_grid_cbar_pad = self.cbar_pad - self.axes_pad[0]
+        if axes_kwargs is None:
+            self.axes_kwargs = {}
         else:
-            axes_grid_cbar_pad = self.cbar_pad
+            self.axes_kwargs = axes_kwargs
 
-        self.cbar_short_side_pad = cbar_short_side_pad
+        self.construct_axes()
 
+    def construct_axes(self):
         self.fig = plt.figure()
         self.grid = AxesGrid(
-            self.fig, self.rect(), nrows_ncols=(self.rows, self.cols),
-            cbar_size=self.cbar_size, cbar_pad=axes_grid_cbar_pad,
+            self.fig, self.rect, nrows_ncols=(self.rows, self.cols),
+            cbar_size=self.cbar_size, cbar_pad=self.axes_grid_cbar_pad,
             axes_pad=self.axes_pad, cbar_mode=self.cbar_mode,
             cbar_location=self.cbar_location, aspect=False
         )
@@ -264,6 +277,39 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         self.make_shared_ticklabels_invisible()
         self.caxes = self.resize_colorbars()
 
+    @property
+    def axes_grid_cbar_pad(self):
+        """For some reason the colorbar when the colorbar is placed at the
+        bottom or left and the colorbar mode is 'single', AxesGrid adds an
+        extra axes pad to the colorbar padding; we correct this manually
+        here.
+        """
+        horizontal_pad, vertical_pad = self.axes_pad
+        if self.cbar_location == 'bottom' and self.cbar_mode == 'single':
+            return self.cbar_pad - vertical_pad
+        elif self.cbar_location == 'left' and self.cbar_mode == 'single':
+            return self.cbar_pad - horizontal_pad
+        else:
+            return self.cbar_pad
+
+    @property
+    def rect(self):
+        """Compute the rect defining the area within the outer padding"""
+        x0 = self.left_pad / self.width
+        y0 = self.bottom_pad / self.height
+        width = (self.width - self.left_pad - self.right_pad) / self.width
+        height = (self.height - self.top_pad - self.bottom_pad) / self.height
+        return [x0, y0, width, height]
+
+
+# Interface for a subclass is:
+# define width, height, and aspect properties
+# define plot_height, and plot_width properties
+
+class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
+    """An AxesGrid object with a figure constrained to a precise width
+    with panels with a prescribed aspect ratio.
+    """
     @property
     def plot_width(self):
         """Width of plot area in each panel (in inches)"""
@@ -289,6 +335,16 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         return self.plot_width * self.aspect
 
     @property
+    def width(self):
+        """Width of the complete figure in inches"""
+        return self._width
+
+    @property
+    def aspect(self):
+        """Aspect ratio of each panel in the figure (height / width)"""
+        return self._aspect
+
+    @property
     def height(self):
         """Height of the complete figure in inches"""
         _, vpad = self.axes_pad
@@ -307,10 +363,60 @@ class WidthConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
             return (total_plot_height + total_axes_pad + outer_pad +
                     cbar_width)
 
-    def rect(self):
-        """Compute the rect defining the area within the outer padding"""
-        x0 = self.left_pad / self.width
-        y0 = self.bottom_pad / self.height
-        width = (self.width - self.left_pad - self.right_pad) / self.width
-        height = (self.height - self.top_pad - self.bottom_pad) / self.height
-        return [x0, y0, width, height]
+
+class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
+    """An AxesGrid object with a figure constrained to a precise width
+    with panels with a prescribed aspect ratio.
+    """
+    @property
+    def plot_height(self):
+        """Height of plot area in each panel (in inches)"""
+        _, vertical_pad = self.axes_pad
+        inner_height = self.height - self.bottom_pad - self.top_pad
+        inner_pad = (self.rows - 1) * vertical_pad
+        cbar_width = self.cbar_pad + self.cbar_size
+
+        if self.cbar_mode is None or self.cbar_location in _LR:
+            return (inner_height - inner_pad) / self.rows
+        elif self.cbar_mode == 'each' and self.cbar_location in _BT:
+            return (inner_height - inner_pad
+                    - self.rows * cbar_width) / self.rows
+        elif (self.cbar_mode == 'single' or
+              self.cbar_mode == 'edge') and self.cbar_location in _BT:
+            return (inner_height - inner_pad - cbar_width) / self.rows
+        else:
+            raise ValueError('Invalid cbar_mode or cbar_location provided')
+
+    @property
+    def plot_width(self):
+        """Width of plot area in panel (in inches)"""
+        return self.plot_height / self.aspect
+
+    @property
+    def height(self):
+        """Height of the complete figure in inches"""
+        return self._height
+
+    @property
+    def aspect(self):
+        """Aspect ratio of each panel in the figure (height / width)"""
+        return self._aspect
+
+    @property
+    def width(self):
+        """Width of the complete figure in inches"""
+        horizontal_pad, _ = self.axes_pad
+        total_plot_width = self.cols * self.plot_width
+        total_axes_pad = (self.cols - 1) * horizontal_pad
+        outer_pad = self.left_pad + self.right_pad
+        cbar_width = self.cbar_size + self.cbar_pad
+
+        if self.cbar_mode is None or self.cbar_location in _BT:
+            return total_plot_height + total_axes_pad + outer_pad
+        elif self.cbar_mode == 'each' and self.cbar_location in _LR:
+            return (total_plot_width + total_axes_pad + outer_pad + self.cols
+                    * cbar_width)
+        elif (self.cbar_mode == 'single' or
+              self.cbar_mode == 'edge') and self.cbar_location in _LR:
+            return (total_plot_width + total_axes_pad + outer_pad +
+                    cbar_width)
