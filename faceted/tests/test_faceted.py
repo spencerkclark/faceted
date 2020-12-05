@@ -43,9 +43,10 @@ def test_faceted_cbar_mode_each():
     plt.close(fig)
 
 
-def test_faceted_cbar_mode_invalid():
+@pytest.mark.parametrize(('width', 'height', 'aspect'), [(1, 1, None), (1, None, 1), (None, 1, 1)])
+def test_faceted_cbar_mode_invalid(width, height, aspect):
     with pytest.raises(ValueError):
-        faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, cbar_mode='invalid')
+        faceted(1, 2, width=width, height=height, aspect=aspect, cbar_mode='invalid')
 
 
 def test_faceted_invalid_internal_pad():
