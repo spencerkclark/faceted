@@ -9,6 +9,15 @@ What's New
 v0.2 (unreleased)
 =================
 
+- :py:meth:`faceted.faceted` now supports three types of constrained figures:
+  width-and-aspect constrained (as before), height-and-aspect constrained, and
+  width-and-height constrained.  Note the you must provide exactly two of the
+  ``width``, ``height``, and ``aspect`` arguments in your call.  A minor
+  breaking change is that defaults are no longer provided for ``width`` and
+  ``aspect`` (it would be cumbersome to have to override one of them with
+  ``None`` in the case of creating a height-and-aspect constrained or
+  width-and-height constrained figure).
+
 .. _whats-new.0.1:
 
 v0.1 (2019-03-07)
