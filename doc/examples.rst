@@ -93,8 +93,8 @@ from the time mean at each location in the lower row instead.
     @savefig example_tair_share_axes.png
     fig.show()
 
-Other kinds of constraints
---------------------------
+Types of constrained figures
+----------------------------
 
 :py:meth:`faceted.faceted` supports multiple kinds of constrained figures.  We simply need
 to provide exactly two of the ``width``, ``height``, and ``aspect`` arguments and :py:meth:`faceted.faceted`
