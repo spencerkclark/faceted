@@ -9,6 +9,7 @@ dependencies:
     - nc-time-axis
     - numpy
     - pytest
+    - scipy
     - ipython=7.2.0
     - cftime=1.0.3.4
     - sphinx=1.8.2
