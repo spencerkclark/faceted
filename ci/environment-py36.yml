@@ -8,6 +8,7 @@ dependencies:
     - matplotlib
     - numpy
     - pytest
+    - scipy
     - pip:
       - coveralls
       - pytest-cov
