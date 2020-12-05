@@ -19,7 +19,7 @@ illustrating the different features.  Using it in many ways resembles using
                                                time=slice(0, 11))
     temp = ds.Tair
     
-    fig, axes = faceted(2, 3, width=8)
+    fig, axes = faceted(2, 3, width=8, aspect=0.618)
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
@@ -44,7 +44,7 @@ width.
 .. ipython:: python
     :okwarning:
 
-    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.9,
+    fig, axes = faceted(2, 3, width=8, aspect=0.618, left_pad=0.75, bottom_pad=0.9,
                         internal_pad=(0.33, 0.66))
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
@@ -75,7 +75,7 @@ from the time mean at each location in the lower row instead.
     mean = (ds.Tair * time_weights).sum('time') / time_weights.where(np.isfinite(ds.Tair)).sum('time')
     anomaly = ds.Tair - mean
     
-    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.9,
+    fig, axes = faceted(2, 3, width=8, aspect=0.618, left_pad=0.75, bottom_pad=0.9,
                         internal_pad=(0.33, 0.66), sharey='row')
     for i, ax in enumerate(axes[:3]):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
@@ -91,8 +91,101 @@ from the time mean at each location in the lower row instead.
         ax.tick_params(axis='x', labelrotation=45)
         
     @savefig example_tair_share_axes.png
-    fig.show()    
+    fig.show()
+
+Types of constrained figures
+----------------------------
+
+:py:meth:`faceted.faceted` supports multiple kinds of constrained figures.  We simply need
+to provide exactly two of the ``width``, ``height``, and ``aspect`` arguments and :py:meth:`faceted.faceted`
+does the rest.
+
+Width-and-aspect constrained figure
+###################################
+
+This is what we've shown already, but for completeness we'll repeat the example again here.
+
+.. ipython:: python
+    :okwarning:
+
+    import matplotlib.pyplot as plt
+    import xarray as xr
+    from matplotlib import ticker
+    from faceted import faceted
+
+    tick_locator = ticker.MaxNLocator(nbins=3)
     
+    ds = xr.tutorial.load_dataset('rasm').isel(x=slice(30, 37), y=-1,
+                                               time=slice(0, 11))
+    temp = ds.Tair
+    
+    fig, axes = faceted(2, 3, width=8, aspect=0.618)
+    for i, ax in enumerate(axes):
+        temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
+        ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Temperature [C]')
+        ax.tick_params(axis='x', labelrotation=45)
+
+    @savefig example_tair_base.png
+    fig.show()
+
+Height-and-aspect constrained figure
+####################################
+
+.. ipython:: python
+    :okwarning:
+
+    import matplotlib.pyplot as plt
+    import xarray as xr
+    from matplotlib import ticker
+    from faceted import faceted
+
+    tick_locator = ticker.MaxNLocator(nbins=3)
+    
+    ds = xr.tutorial.load_dataset('rasm').isel(x=slice(30, 37), y=-1,
+                                               time=slice(0, 11))
+    temp = ds.Tair
+    
+    fig, axes = faceted(2, 3, height=8., aspect=0.618)
+    for i, ax in enumerate(axes):
+        temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
+        ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Temperature [C]')
+        ax.tick_params(axis='x', labelrotation=45)
+
+    @savefig example_tair_base.png
+    fig.show()
+
+Width-and-height constrained figure
+###################################
+    
+.. ipython:: python
+    :okwarning:
+
+    import matplotlib.pyplot as plt
+    import xarray as xr
+    from matplotlib import ticker
+    from faceted import faceted
+
+    tick_locator = ticker.MaxNLocator(nbins=3)
+    
+    ds = xr.tutorial.load_dataset('rasm').isel(x=slice(30, 37), y=-1,
+                                               time=slice(0, 11))
+    temp = ds.Tair
+    
+    fig, axes = faceted(2, 3, width=8, height=6.)
+    for i, ax in enumerate(axes):
+        temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
+        ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Temperature [C]')
+        ax.tick_params(axis='x', labelrotation=45)
+
+    @savefig example_tair_base.png
+    fig.show()
+
 Colorbar modes and locations
 ----------------------------
 

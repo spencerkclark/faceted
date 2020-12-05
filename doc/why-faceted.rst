@@ -341,8 +341,3 @@ main reason for creating :py:mod:`faceted` was that these other tools
 were *too* flexible at the expense of simplicity.  For a large percentage of
 the use cases, they are not required, but for the remaining percentage they are
 indeed quite useful.
-
-Currently only figures constrained by width and panel aspect ratio are
-possible in :py:mod:`faceted`.  That said, figures constrained by any two of
-the width, height, and panel aspect ratio would be within scope.  See
-:issue:`15` for discussion.

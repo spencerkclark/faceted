@@ -3,8 +3,8 @@ faceted
 
 [![Build Status](https://travis-ci.org/spencerkclark/faceted.svg?branch=master)](https://travis-ci.org/spencerkclark/faceted)[![Coverage Status](https://coveralls.io/repos/github/spencerkclark/faceted/badge.svg?branch=master)](https://coveralls.io/github/spencerkclark/faceted?branch=master)[![Documentation Status](https://readthedocs.org/projects/faceted/badge/?version=latest)](https://faceted.readthedocs.io/en/latest/?badge=latest)
 
-Figures with precise control over overall width, plot aspect ratio,
-between-plot spacing, and colorbar dimensions.
+Figures with precise control over overall width, overall height,
+plot aspect ratio, between-plot spacing, and colorbar dimensions.
 
 Description
 -----------
