@@ -13,6 +13,9 @@ def faceted(rows, cols, width=8., height=None, aspect=0.618, top_pad=0.25,
             axes_kwargs=None):
     """Create figure and tiled axes objects with precise attributes.
 
+    Exactly two of width, height, and aspect must be defined.  The third is
+    inferred based on the other two values.
+
     Parameters
     ----------
     rows : int

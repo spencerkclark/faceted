@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from faceted import faceted, HeightConstrainedAxesGrid, HeightAndWidthConstrainedAxesGrid, WidthConstrainedAxesGrid
+from ..faceted import faceted, _infer_grid_class, HeightConstrainedAxesGrid, HeightAndWidthConstrainedAxesGrid, WidthConstrainedAxesGrid
 
 
 plt.switch_backend('agg')
@@ -51,6 +51,18 @@ def test_faceted_cbar_mode_invalid():
 def test_faceted_invalid_internal_pad():
     with pytest.raises(ValueError):
         faceted(1, 2, internal_pad=(1, 2, 3))
+
+
+@pytest.mark.parametrize(('width', 'height', 'aspect'), [(None, None, None), (5., None, None), (None, 5., None), (None, None, 5.), (5., 5., 5.)])
+def test_faceted_invalid_constraints(width, height, aspect):
+    with pytest.raises(ValueError, match='Exactly'):
+        faceted(1, 2, width=width, height=height, aspect=aspect)
+
+
+@pytest.mark.parametrize(('width', 'height', 'aspect', 'expected'), [(5., 5., None, HeightAndWidthConstrainedAxesGrid), (5., None, 5., WidthConstrainedAxesGrid), (None, 5., 5., HeightConstrainedAxesGrid)])
+def test__infer_grid_class(width, height, aspect, expected):
+    result = _infer_grid_class(width, height, aspect)
+    assert result == expected
 
 
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
@@ -413,7 +425,6 @@ def assert_visible_xticklabels(ax):
 
 
 def assert_invisible_xticklabels(ax):
-    print(dir(ax.xaxis._get_tick(ax.xaxis.major)))
     assert not ax.xaxis._get_tick(ax.xaxis.major).label1.get_visible()
     assert not ax.xaxis._get_tick(ax.xaxis.minor).label1.get_visible()
 
