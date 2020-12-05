@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from faceted import faceted, HeightConstrainedAxesGrid, WidthConstrainedAxesGrid
+from faceted import faceted, HeightConstrainedAxesGrid, HeightAndWidthConstrainedAxesGrid, WidthConstrainedAxesGrid
 
 
 plt.switch_backend('agg')
@@ -16,7 +16,7 @@ _TOP_PAD = _BOTTOM_PAD = _LEFT_PAD = _RIGHT_PAD = 0.25
 _HORIZONTAL_INTERNAL_PAD = 0.25
 _VERTICAL_INTERNAL_PAD = 0.5
 _INTERNAL_PAD = (_HORIZONTAL_INTERNAL_PAD, _VERTICAL_INTERNAL_PAD)
-_ASPECT = 0.5
+_ASPECT_CONSTRAINT = 0.5
 _HEIGHT_CONSTRAINT = 7.
 _WIDTH_CONSTRAINT = 8.
 _SHORT_SIDE_PAD = 0.25
@@ -56,7 +56,7 @@ def test_faceted_invalid_internal_pad():
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
 _CBAR_MODES = [None, 'single', 'each', 'edge']
 _CBAR_LOCATIONS = ['bottom', 'right', 'top', 'left']
-_CONSTRAINTS = ['height', 'width']
+_CONSTRAINTS = ['height', 'width', 'height-and-width']
 _CG_LAYOUTS = product(_CBAR_MODES, _CBAR_LOCATIONS, _LAYOUTS, _CONSTRAINTS)
 
 
@@ -75,7 +75,7 @@ def grid(request):
     mode, location, (rows, cols), constraint = request.param
     if constraint == 'width':
         obj = WidthConstrainedAxesGrid(
-            rows, cols, width=_WIDTH_CONSTRAINT, aspect=_ASPECT,
+            rows, cols, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT,
             top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
             left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
             cbar_mode=mode, cbar_pad=_LONG_SIDE_PAD,
@@ -84,7 +84,16 @@ def grid(request):
             cbar_short_side_pad=_SHORT_SIDE_PAD)
     elif constraint == 'height':
         obj = HeightConstrainedAxesGrid(
-            rows, cols, height=_HEIGHT_CONSTRAINT, aspect=_ASPECT,
+            rows, cols, height=_HEIGHT_CONSTRAINT, aspect=_ASPECT_CONSTRAINT,
+            top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
+            left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
+            cbar_mode=mode, cbar_pad=_LONG_SIDE_PAD,
+            axes_pad=_INTERNAL_PAD, cbar_location=location,
+            cbar_size=_CBAR_THICKNESS,
+            cbar_short_side_pad=_SHORT_SIDE_PAD)
+    elif constraint == 'height-and-width':
+        obj = HeightAndWidthConstrainedAxesGrid(
+            rows, cols, height=_HEIGHT_CONSTRAINT, width=_WIDTH_CONSTRAINT,
             top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
             left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
             cbar_mode=mode, cbar_pad=_LONG_SIDE_PAD,
@@ -107,24 +116,24 @@ def get_tile_height(grid, bottom_pad=_BOTTOM_PAD, top_pad=_TOP_PAD):
             (grid.rows - 1) * _VERTICAL_INTERNAL_PAD) / grid.rows
 
 
-def test_width_constrained_axes_positions(grid):
+def test_constrained_axes_positions(grid):
     if grid.cbar_mode == 'each':
-        check_width_constrained_axes_positions_each(grid)
+        check_constrained_axes_positions_each(grid)
     elif grid.cbar_mode == 'single':
-        check_width_constrained_axes_positions_single(grid)
+        check_constrained_axes_positions_single(grid)
     elif grid.cbar_mode == 'edge':
-        check_width_constrained_axes_positions_edge(grid)
+        check_constrained_axes_positions_edge(grid)
     elif grid.cbar_mode is None:
-        check_width_constrained_axes_positions_none(grid)
+        check_constrained_axes_positions_none(grid)
 
 
-def test_width_constrained_caxes_positions(grid):
+def test_constrained_caxes_positions(grid):
     if grid.cbar_mode == 'each':
-        check_width_constrained_caxes_positions_each(grid)
+        check_constrained_caxes_positions_each(grid)
     elif grid.cbar_mode == 'single':
-        check_width_constrained_caxes_positions_single(grid)
+        check_constrained_caxes_positions_single(grid)
     elif grid.cbar_mode == 'edge':
-        check_width_constrained_caxes_positions_edge(grid)
+        check_constrained_caxes_positions_edge(grid)
     elif grid.cbar_mode is None:
         pytest.skip('Skipping colorbar positions test, because cbar_mode=None')
 
@@ -142,7 +151,7 @@ def test_plot_aspect(grid):
         np.testing.assert_allclose(result, expected)
 
 
-def check_width_constrained_axes_positions_none(grid):
+def check_constrained_axes_positions_none(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
@@ -161,7 +170,7 @@ def check_width_constrained_axes_positions_none(grid):
         np.testing.assert_allclose(ax_bounds, expected_bounds)
 
 
-def check_width_constrained_axes_positions_single(grid):
+def check_constrained_axes_positions_single(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     cbar_location = grid.cbar_location
@@ -194,7 +203,7 @@ def check_width_constrained_axes_positions_single(grid):
         np.testing.assert_allclose(ax_bounds, expected_bounds)
 
 
-def check_width_constrained_caxes_positions_single(grid):
+def check_constrained_caxes_positions_single(grid):
     width, height = grid.width, grid.height
     cbar_location = grid.cbar_location
     fig = grid.fig
@@ -225,7 +234,7 @@ def check_width_constrained_caxes_positions_single(grid):
     np.testing.assert_allclose(cax_bounds, expected_bounds)
 
 
-def check_width_constrained_axes_positions_each(grid):
+def check_constrained_axes_positions_each(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
@@ -281,7 +290,7 @@ def check_width_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
 
 
-def check_width_constrained_caxes_positions_each(grid):
+def check_constrained_caxes_positions_each(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
@@ -337,12 +346,12 @@ def check_width_constrained_caxes_positions_each(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
 
 
-def check_width_constrained_axes_positions_edge(grid):
+def check_constrained_axes_positions_edge(grid):
     # The positions of the axes are the same as for cbar_mode='single'
-    check_width_constrained_axes_positions_single(grid)
+    check_constrained_axes_positions_single(grid)
 
 
-def check_width_constrained_caxes_positions_edge(grid):
+def check_constrained_caxes_positions_edge(grid):
     rows, cols = grid.rows, grid.cols
     width, height = grid.width, grid.height
     tile_width, tile_height = get_tile_width(grid), get_tile_height(grid)
@@ -394,7 +403,7 @@ def check_width_constrained_caxes_positions_edge(grid):
 
 def shared_grid(sharex, sharey):
     return WidthConstrainedAxesGrid(
-        2, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT, sharex=sharex, sharey=sharey,
+        2, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, sharex=sharex, sharey=sharey,
         cbar_mode='single')
 
 

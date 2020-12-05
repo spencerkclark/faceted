@@ -100,7 +100,7 @@ def _infer_grid_class(width, height, aspect):
     elif height is not None and aspect is not None:
         return HeightConstrainedAxesGrid
     else:
-        raise NotImplementedError()
+        return HeightAndWidthConstrainedAxesGrid
 
 
 class CbarShortSidePadMixin(object):
@@ -302,10 +302,6 @@ class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
         return [x0, y0, width, height]
 
 
-# Interface for a subclass is:
-# define width, height, and aspect properties
-# define plot_height, and plot_width properties
-
 class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
     """An AxesGrid object with a figure constrained to a precise width
     with panels with a prescribed aspect ratio.
@@ -365,7 +361,7 @@ class WidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Share
 
 
 class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
-    """An AxesGrid object with a figure constrained to a precise width
+    """An AxesGrid object with a figure constrained to a precise height
     with panels with a prescribed aspect ratio.
     """
     @property
@@ -420,3 +416,61 @@ class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Shar
               self.cbar_mode == 'edge') and self.cbar_location in _LR:
             return (total_plot_width + total_axes_pad + outer_pad +
                     cbar_width)
+
+
+class HeightAndWidthConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, ShareAxesMixin):
+    """An AxesGrid object with a figure constrained to a precise height and width
+    with panels with a flexible aspect ratio.
+    """
+    @property
+    def plot_width(self):
+        """Width of plot area in each panel (in inches)"""
+        hpad, _ = self.axes_pad
+        inner_width = self.width - self.left_pad - self.right_pad
+        inner_pad = (self.cols - 1) * hpad
+        cbar_width = self.cbar_pad + self.cbar_size
+
+        if self.cbar_mode is None or self.cbar_location in _BT:
+            return (inner_width - inner_pad) / self.cols
+        elif self.cbar_mode == 'each' and self.cbar_location in _LR:
+            return (inner_width - inner_pad
+                    - self.cols * cbar_width) / self.cols
+        elif (self.cbar_mode == 'single' or
+              self.cbar_mode == 'edge') and self.cbar_location in _LR:
+            return (inner_width - inner_pad - cbar_width) / self.cols
+        else:
+            raise ValueError('Invalid cbar_mode or cbar_location provided')
+
+    @property
+    def plot_height(self):
+        """Height of plot area in each panel (in inches)"""
+        _, vertical_pad = self.axes_pad
+        inner_height = self.height - self.bottom_pad - self.top_pad
+        inner_pad = (self.rows - 1) * vertical_pad
+        cbar_width = self.cbar_pad + self.cbar_size
+
+        if self.cbar_mode is None or self.cbar_location in _LR:
+            return (inner_height - inner_pad) / self.rows
+        elif self.cbar_mode == 'each' and self.cbar_location in _BT:
+            return (inner_height - inner_pad
+                    - self.rows * cbar_width) / self.rows
+        elif (self.cbar_mode == 'single' or
+              self.cbar_mode == 'edge') and self.cbar_location in _BT:
+            return (inner_height - inner_pad - cbar_width) / self.rows
+        else:
+            raise ValueError('Invalid cbar_mode or cbar_location provided')
+
+    @property
+    def height(self):
+        """Height of the complete figure in inches"""
+        return self._height
+
+    @property
+    def width(self):
+        """Width of the complete figure in inches"""
+        return self._width
+
+    @property
+    def aspect(self):
+        """Aspect ratio of each panel in the figure (height / width)"""
+        return self.plot_height / self.plot_width
