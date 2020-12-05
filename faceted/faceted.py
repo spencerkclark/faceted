@@ -412,7 +412,7 @@ class HeightConstrainedAxesGrid(ConstrainedAxesGrid, CbarShortSidePadMixin, Shar
         cbar_width = self.cbar_size + self.cbar_pad
 
         if self.cbar_mode is None or self.cbar_location in _BT:
-            return total_plot_height + total_axes_pad + outer_pad
+            return total_plot_width + total_axes_pad + outer_pad
         elif self.cbar_mode == 'each' and self.cbar_location in _LR:
             return (total_plot_width + total_axes_pad + outer_pad + self.cols
                     * cbar_width)

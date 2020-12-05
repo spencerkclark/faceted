@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from faceted import faceted, WidthConstrainedAxesGrid
+from faceted import faceted, HeightConstrainedAxesGrid, WidthConstrainedAxesGrid
 
 
 plt.switch_backend('agg')
@@ -17,6 +17,7 @@ _HORIZONTAL_INTERNAL_PAD = 0.25
 _VERTICAL_INTERNAL_PAD = 0.5
 _INTERNAL_PAD = (_HORIZONTAL_INTERNAL_PAD, _VERTICAL_INTERNAL_PAD)
 _ASPECT = 0.5
+_HEIGHT_CONSTRAINT = 7.
 _WIDTH_CONSTRAINT = 8.
 _SHORT_SIDE_PAD = 0.25
 _LONG_SIDE_PAD = 0.25
@@ -55,13 +56,14 @@ def test_faceted_invalid_internal_pad():
 _LAYOUTS = [(1, 1), (1, 2), (2, 1), (2, 2), (5, 3)]
 _CBAR_MODES = [None, 'single', 'each', 'edge']
 _CBAR_LOCATIONS = ['bottom', 'right', 'top', 'left']
-_CG_LAYOUTS = product(_CBAR_MODES, _CBAR_LOCATIONS, _LAYOUTS)
+_CONSTRAINTS = ['height', 'width']
+_CG_LAYOUTS = product(_CBAR_MODES, _CBAR_LOCATIONS, _LAYOUTS, _CONSTRAINTS)
 
 
 def format_layout(layout):
-    cbar_mode, cbar_loc, (rows, cols) = layout
-    return 'cbar_mode={!r}, cbar_location={!r}, rows={}, cols={}'.format(
-        cbar_mode, cbar_loc, rows, cols)
+    cbar_mode, cbar_loc, (rows, cols), constraint = layout
+    return 'cbar_mode={!r}, cbar_location={!r}, rows={}, cols={}, constraint={}'.format(
+        cbar_mode, cbar_loc, rows, cols, constraint)
 
 
 _CG_IDS = OrderedDict([(layout, format_layout(layout))
@@ -70,15 +72,27 @@ _CG_IDS = OrderedDict([(layout, format_layout(layout))
 
 @pytest.fixture(params=_CG_IDS.keys(), ids=_CG_IDS.values())
 def grid(request):
-    mode, location, (rows, cols) = request.param
-    obj = WidthConstrainedAxesGrid(
-        rows, cols, width=_WIDTH_CONSTRAINT, aspect=_ASPECT,
-        top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
-        left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
-        cbar_mode=mode, cbar_pad=_LONG_SIDE_PAD,
-        axes_pad=_INTERNAL_PAD, cbar_location=location,
-        cbar_size=_CBAR_THICKNESS,
-        cbar_short_side_pad=_SHORT_SIDE_PAD)
+    mode, location, (rows, cols), constraint = request.param
+    if constraint == 'width':
+        obj = WidthConstrainedAxesGrid(
+            rows, cols, width=_WIDTH_CONSTRAINT, aspect=_ASPECT,
+            top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
+            left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
+            cbar_mode=mode, cbar_pad=_LONG_SIDE_PAD,
+            axes_pad=_INTERNAL_PAD, cbar_location=location,
+            cbar_size=_CBAR_THICKNESS,
+            cbar_short_side_pad=_SHORT_SIDE_PAD)
+    elif constraint == 'height':
+        obj = HeightConstrainedAxesGrid(
+            rows, cols, height=_HEIGHT_CONSTRAINT, aspect=_ASPECT,
+            top_pad=_TOP_PAD, bottom_pad=_BOTTOM_PAD,
+            left_pad=_LEFT_PAD, right_pad=_RIGHT_PAD,
+            cbar_mode=mode, cbar_pad=_LONG_SIDE_PAD,
+            axes_pad=_INTERNAL_PAD, cbar_location=location,
+            cbar_size=_CBAR_THICKNESS,
+            cbar_short_side_pad=_SHORT_SIDE_PAD)
+    else:
+        raise NotImplementedError()
     yield obj
     plt.close(obj.fig)
 
