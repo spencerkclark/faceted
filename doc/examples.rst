@@ -19,7 +19,7 @@ illustrating the different features.  Using it in many ways resembles using
                                                time=slice(0, 11))
     temp = ds.Tair
     
-    fig, axes = faceted(2, 3, width=8)
+    fig, axes = faceted(2, 3, width=8, aspect=0.618)
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
@@ -44,7 +44,7 @@ width.
 .. ipython:: python
     :okwarning:
 
-    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.9,
+    fig, axes = faceted(2, 3, width=8, aspect=0.618, left_pad=0.75, bottom_pad=0.9,
                         internal_pad=(0.33, 0.66))
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
@@ -75,7 +75,7 @@ from the time mean at each location in the lower row instead.
     mean = (ds.Tair * time_weights).sum('time') / time_weights.where(np.isfinite(ds.Tair)).sum('time')
     anomaly = ds.Tair - mean
     
-    fig, axes = faceted(2, 3, width=8, left_pad=0.75, bottom_pad=0.9,
+    fig, axes = faceted(2, 3, width=8, aspect=0.618, left_pad=0.75, bottom_pad=0.9,
                         internal_pad=(0.33, 0.66), sharey='row')
     for i, ax in enumerate(axes[:3]):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')

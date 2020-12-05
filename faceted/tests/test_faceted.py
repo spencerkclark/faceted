@@ -25,19 +25,19 @@ _CBAR_THICKNESS = 0.125
 
 
 def test_faceted_cbar_mode_none():
-    fig, axes = faceted(1, 2)
+    fig, axes = faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT)
     assert len(axes) == 2
     plt.close(fig)
 
 
 def test_faceted_cbar_mode_single():
-    fig, axes, cax = faceted(1, 2, cbar_mode='single')
+    fig, axes, cax = faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, cbar_mode='single')
     assert len(axes) == 2
     plt.close(fig)
 
 
 def test_faceted_cbar_mode_each():
-    fig, axes, caxes = faceted(1, 2, cbar_mode='each')
+    fig, axes, caxes = faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, cbar_mode='each')
     assert len(axes) == 2
     assert len(axes) == len(caxes)
     plt.close(fig)
@@ -45,12 +45,12 @@ def test_faceted_cbar_mode_each():
 
 def test_faceted_cbar_mode_invalid():
     with pytest.raises(ValueError):
-        faceted(1, 2, cbar_mode='invalid')
+        faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, cbar_mode='invalid')
 
 
 def test_faceted_invalid_internal_pad():
     with pytest.raises(ValueError):
-        faceted(1, 2, internal_pad=(1, 2, 3))
+        faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, internal_pad=(1, 2, 3))
 
 
 @pytest.mark.parametrize(('width', 'height', 'aspect'), [(None, None, None), (5., None, None), (None, 5., None), (None, None, 5.), (5., 5., 5.)])
@@ -552,7 +552,7 @@ def test_cartopy():
     import cartopy.crs as ccrs
     from cartopy.mpl.geoaxes import GeoAxes
 
-    fig, axes = faceted(2, 2, axes_kwargs={'projection': ccrs.PlateCarree()})
+    fig, axes = faceted(2, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT, axes_kwargs={'projection': ccrs.PlateCarree()})
     for ax in axes:
         assert isinstance(ax, GeoAxes)
     plt.close(fig)
