@@ -40,7 +40,7 @@ script:
       cd doc;
       sphinx-build -n -j auto -b html -d _build/doctrees . _build/html;
     else
-      black --check --exclude _version.py .
+      black --check --exclude _version.py .;
       py.test faceted --cov=faceted --cov-report term-missing --verbose;
     fi
 after_success:
