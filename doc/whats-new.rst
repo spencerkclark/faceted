@@ -17,6 +17,10 @@ v0.2 (2020-12-06)
   ``aspect`` (it would be cumbersome to have to override one of them with
   ``None`` in the case of creating a height-and-aspect constrained or
   width-and-height constrained figure).
+- A new convenience function for creating single-axis figures called
+  :py:meth:`faceted.faceted_ax`.  It takes the same keyword arguments as the
+  full :py:meth:`faceted.faceted` function, except automatically returns
+  scalar ``Axes`` objects.
 
 .. _whats-new.0.1:
 

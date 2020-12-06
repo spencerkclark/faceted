@@ -1,4 +1,4 @@
-from .faceted import faceted
+from .faceted import faceted, faceted_ax
 from ._version import get_versions
 
 __version__ = get_versions()["version"]
