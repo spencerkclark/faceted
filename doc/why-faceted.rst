@@ -15,14 +15,14 @@ one of these solutions, e.g.
     import xarray as xr
     import matplotlib.pyplot as plt
 
-    ds = xr.tutorial.load_dataset('rasm').isel(time=slice(0, 3))
+    ds = xr.tutorial.load_dataset('air_temperature').isel(time=slice(0, 3))
     fig, axes = plt.subplots(1, 3, figsize=(8, 4))
 
     for i, ax in enumerate(axes):
-          c = ds.Tair.isel(time=i).plot.pcolormesh(
-              ax=ax, add_colorbar=False, vmin=-30, vmax=30)
+          c = ds.air.isel(time=i).plot.pcolormesh(
+              ax=ax, add_colorbar=False, vmin=230, vmax=305)
     plt.tight_layout()
-    
+
     @savefig example_tair.png
     fig.colorbar(c, ax=axes.ravel().tolist(), orientation='horizontal',
         label='Air temperature');
@@ -118,8 +118,8 @@ If we use these values when plotting we get:
     fig, axes = plt.subplots(1, 3, figsize=(w, 4), sharey=True)
     
     for i, ax in enumerate(axes):
-          c = ds.Tair.isel(time=i).plot.pcolormesh(
-              ax=ax, add_colorbar=False, vmin=-30, vmax=30)
+          c = ds.air.isel(time=i).plot.pcolormesh(
+              ax=ax, add_colorbar=False, vmin=230, vmax=305)
     fig.subplots_adjust(left=left, right=right, wspace=wspace)
     
     @savefig example_tair_adjusted.png
@@ -194,8 +194,8 @@ general:
     fig, axes = plt.subplots(1, 3, figsize=(w, h), sharey=True)
     
     for i, ax in enumerate(axes):
-          c = ds.Tair.isel(time=i).plot.pcolormesh(
-              ax=ax, add_colorbar=False, vmin=-30, vmax=30)
+          c = ds.air.isel(time=i).plot.pcolormesh(
+              ax=ax, add_colorbar=False, vmin=230, vmax=305)
     fig.subplots_adjust(left=left, right=right, wspace=wspace, top=top, bottom=bottom)
     
     @savefig example_tair_adjusted_cbar.png
@@ -236,7 +236,7 @@ the colorbar size parameters:
    
 .. ipython:: python
 
-    a = 75. / 360
+    a = 60. / 130.
     p_cbar = 0.25
     h_panel = a * w_panel
     h = p_bottom + p_top + h_panel + p_cbar + w_cbar
@@ -252,16 +252,15 @@ the colorbar size parameters:
 
     import cartopy.crs as ccrs
 
-    ds = xr.tutorial.load_dataset('rasm').isel(time=slice(0, 3))
     fig, axes = plt.subplots(1, 3, figsize=(w, h),
         subplot_kw={'projection': ccrs.PlateCarree()})
 
     for i, ax in enumerate(axes):
-          c = ds.Tair.isel(time=i).plot.pcolormesh(
-              ax=ax, x='xc', y='yc', add_colorbar=False, vmin=-30, vmax=30,
+          c = ds.air.isel(time=i).plot.pcolormesh(
+              ax=ax, add_colorbar=False, vmin=230, vmax=305,
               transform=ccrs.PlateCarree())
           ax.coastlines()
-          ax.set_extent([-180, 180, 15, 90], crs=ccrs.PlateCarree())
+          ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
 
     fig.subplots_adjust(left=left, right=right, wspace=wspace, top=top, bottom=bottom)
     
@@ -316,11 +315,11 @@ top-level function.
                              axes_kwargs={'projection': ccrs.PlateCarree()})
 
     for i, ax in enumerate(axes):
-          c = ds.Tair.isel(time=i).plot.pcolormesh(
-              ax=ax, x='xc', y='yc', add_colorbar=False, vmin=-30, vmax=30,
+          c = ds.air.isel(time=i).plot.pcolormesh(
+              ax=ax, add_colorbar=False, vmin=230, vmax=305,
               transform=ccrs.PlateCarree())
           ax.coastlines()
-          ax.set_extent([-180, 180, 15, 90], crs=ccrs.PlateCarree())
+          ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
 
      @savefig example_tair_faceted.png     
      plt.colorbar(c, cax=cax, orientation='horizontal',
