@@ -119,7 +119,8 @@ This is what we've shown already, but for completeness we'll repeat the example 
                                                time=slice(0, 11))
     temp = ds.Tair
     
-    fig, axes = faceted(2, 3, width=8, aspect=0.618)
+    fig, axes = faceted(2, 3, width=8, aspect=0.618, bottom_pad=0.9, left_pad=0.75,
+                        internal_pad=(0.33, 0.66), sharey='row')
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
@@ -127,7 +128,7 @@ This is what we've shown already, but for completeness we'll repeat the example 
         ax.set_ylabel('Temperature [C]')
         ax.tick_params(axis='x', labelrotation=45)
 
-    @savefig example_tair_base.png
+    @savefig example_tair_base_width_and_aspect.png
     fig.show()
 
 Height-and-aspect constrained figure
@@ -147,7 +148,8 @@ Height-and-aspect constrained figure
                                                time=slice(0, 11))
     temp = ds.Tair
     
-    fig, axes = faceted(2, 3, height=8., aspect=0.618)
+    fig, axes = faceted(2, 3, height=8., aspect=0.618, bottom_pad=0.9, left_pad=0.75,
+                        internal_pad=(0.33, 0.66), sharey='row')
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
@@ -155,7 +157,7 @@ Height-and-aspect constrained figure
         ax.set_ylabel('Temperature [C]')
         ax.tick_params(axis='x', labelrotation=45)
 
-    @savefig example_tair_base.png
+    @savefig example_tair_base_height_and_aspect.png
     fig.show()
 
 Width-and-height constrained figure
@@ -175,7 +177,8 @@ Width-and-height constrained figure
                                                time=slice(0, 11))
     temp = ds.Tair
     
-    fig, axes = faceted(2, 3, width=8, height=6.)
+    fig, axes = faceted(2, 3, width=8, height=6., bottom_pad=0.9, left_pad=0.75,
+                        internal_pad=(0.33, 0.66), sharey='row')
     for i, ax in enumerate(axes):
         temp.isel(x=i).plot(ax=ax, marker='o', ls='none')
         ax.set_title('{:0.2f}'.format(temp.xc.isel(x=i).item()))
@@ -183,7 +186,7 @@ Width-and-height constrained figure
         ax.set_ylabel('Temperature [C]')
         ax.tick_params(axis='x', labelrotation=45)
 
-    @savefig example_tair_base.png
+    @savefig example_tair_base_width_and_height.png
     fig.show()
 
 Colorbar modes and locations
@@ -209,22 +212,22 @@ a figure.
 
     import cartopy.crs as ccrs
 
-    ds = xr.tutorial.load_dataset('rasm')
-    
-    aspect = 75. / 180.
+    ds = xr.tutorial.load_dataset('air_temperature')
+
+    aspect = 60. / 130.
     fig, axes, cax = faceted(2, 3, width=8, aspect=aspect,
-                             bottom_pad=0.75, cbar_mode='single',
-                             cbar_pad=0.1, internal_pad=0.1,
-                             cbar_location='bottom', cbar_short_side_pad=0.,
-                             axes_kwargs={'projection': ccrs.PlateCarree()})
+                            bottom_pad=0.75, cbar_mode='single',
+                            cbar_pad=0.1, internal_pad=0.1,
+                            cbar_location='bottom', cbar_short_side_pad=0.,
+                            axes_kwargs={'projection': ccrs.PlateCarree()})
     for i, ax in enumerate(axes):
-        c = ds.Tair.isel(time=i).plot(
+        c = ds.air.isel(time=i).plot(
             ax=ax, add_colorbar=False, transform=ccrs.PlateCarree(),
-            vmin=-30, vmax=30, x='xc', y='yc')
+            vmin=230, vmax=305)
         ax.set_title('')
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_extent([-180, 0, 15, 90], crs=ccrs.PlateCarree())
+        ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
 
     plt.colorbar(c, cax=cax, orientation='horizontal', label='Temperature [C]');
@@ -241,32 +244,32 @@ We'll show an example where the rows share a colorbar.
 .. ipython:: python
     :okwarning:
 
-    aspect = 75. / 180.
+    aspect = 60. / 130.
     fig, axes, (cax1, cax2) = faceted(2, 3, width=8, aspect=aspect, right_pad=0.75,
                                       cbar_mode='edge',
                                       cbar_pad=0.1, internal_pad=0.1,
                                       cbar_location='right', cbar_short_side_pad=0.,
                                       axes_kwargs={'projection': ccrs.PlateCarree()})
     for i, ax in enumerate(axes[:3]):
-        c1 = ds.Tair.isel(time=i).plot(
+        c1 = ds.air.isel(time=i).plot(
             ax=ax, add_colorbar=False, transform=ccrs.PlateCarree(),
-            vmin=-30, vmax=30, x='xc', y='yc')
+            vmin=230, vmax=305)
         ax.set_title('')
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_extent([180, 360, 15, 90], crs=ccrs.PlateCarree())
+        ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
 
     plt.colorbar(c1, cax=cax1, label='[C]');
 
     for i, ax in enumerate(axes[3:], start=3):
-        c2 = ds.Tair.isel(time=i).plot(
+        c2 = ds.air.isel(time=i).plot(
             ax=ax, add_colorbar=False, transform=ccrs.PlateCarree(),
-            vmin=-50, vmax=50, x='xc', y='yc')
+            vmin=230, vmax=305)
         ax.set_title('')
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_extent([-180, 0, 15, 90], crs=ccrs.PlateCarree())
+        ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
 
     plt.colorbar(c2, cax=cax2, label='[C]');
@@ -285,20 +288,20 @@ specifying ``cbar_mode='each'`` as an argument in the call to :py:meth:`faceted.
 
     tick_locator = ticker.MaxNLocator(nbins=3)
     
-    aspect = 75. / 180.
+    aspect = 60. / 130.
     fig, axes, caxes = faceted(2, 3, width=8, aspect=aspect, right_pad=0.75,
                                cbar_mode='each',
                                cbar_pad=0.1, internal_pad=(0.75, 0.1),
                                cbar_location='right', cbar_short_side_pad=0.,
                                axes_kwargs={'projection': ccrs.PlateCarree()})
     for i, (ax, cax) in enumerate(zip(axes, caxes)):
-        c = ds.Tair.isel(time=i).plot(
+        c = ds.air.isel(time=i).plot(
             ax=ax, add_colorbar=False, transform=ccrs.PlateCarree(),
-            x='xc', y='yc', cmap='viridis')
+            cmap='viridis', vmin=230, vmax=305)
         ax.set_title('')
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_extent([-180, 0, 15, 90], crs=ccrs.PlateCarree())
+        ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
         cb = plt.colorbar(c, cax=cax, label='[C]')
         cb.locator = tick_locator
