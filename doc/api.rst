@@ -14,3 +14,4 @@ Functions
    :toctree: generated/
 
    faceted
+   faceted_ax

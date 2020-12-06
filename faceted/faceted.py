@@ -117,6 +117,67 @@ def faceted(
         return grid.fig, grid.axes, grid.caxes
 
 
+def faceted_ax(cbar_mode=None, **kwargs):
+    """A convenience version of faceted for creating single-axis figures.
+
+    Exactly two of width, height, and aspect must be defined.  The third is
+    inferred based on the other two values.  
+
+    Parameters
+    ----------
+    width : float
+        Width of figure
+    height : float
+        Height of figure
+    aspect : float
+        Aspect ratio of plots in each tile
+    top_pad : float
+        Spacing (in inches) between top of figure and axes
+    bottom_pad : float
+        Spacing (in inches) between bottom of figure and axes
+    left_pad : float
+        Spacing (in inches) between left of figure and axes
+    right_pad : float
+        Spacing (in inches) between right of figure and axes
+    internal_pad : float or tuple
+        Spacing in between panels in both the horizontal and vertical
+        directions (in inches); if an individual number, the spacing is the
+        same in the horizontal and vertical; if a tuple is specified, the left
+        value is the horizontal pad, and the right value is the vertical pad.
+    cbar_mode : {None, 'single', 'edge', 'each'}
+        Mode for adding colorbar(s) to figure
+    cbar_short_side_pad : float
+        Spacing between the ends of the colorbar and the edges
+        of the axes (in inches); controls the length of the
+        colorbar
+    cbar_pad : float
+        Spacing between plot axes and the colorbar axes (in inches)
+    cbar_size : float
+        Width of the colorbar in inches
+    cbar_location : {'top', 'bottom', 'left', 'right'}
+        Side of the plot axes (or figure) for the colorbar
+    sharex : bool or {'all', 'col', 'row', 'none'}
+        Share x-axis limits, ticks, and tick labels
+    sharey : bool or {'all', 'col', 'row', 'none'}
+        Share y-axis limits, ticks, and tick labels
+    axes_kwargs : dict
+        Keyword arguments to pass to Axes constructor
+
+    Returns
+    -------
+    fig, ax, cax (if cax requested)
+    """
+    if cbar_mode is None:
+        fig, (ax,) = faceted(1, 1, **kwargs)
+        return fig, ax
+    elif cbar_mode == "single":
+        fig, (ax,), cax = faceted(1, 1, cbar_mode=cbar_mode, **kwargs)
+        return fig, ax, cax
+    elif cbar_mode in ("edge", "each"):
+        fig, (ax,), (cax,) = faceted(1, 1, cbar_mode=cbar_mode, **kwargs)
+        return fig, ax, cax
+
+
 _LR = ["left", "right"]
 _BT = ["bottom", "top"]
 

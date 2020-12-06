@@ -2,12 +2,15 @@
 from collections import OrderedDict
 from itertools import product
 
+import matplotlib.axes
+import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 from ..faceted import (
     faceted,
+    faceted_ax,
     _infer_grid_class,
     HeightConstrainedAxesGrid,
     HeightAndWidthConstrainedAxesGrid,
@@ -655,3 +658,23 @@ def test_cartopy():
     for ax in axes:
         assert isinstance(ax, GeoAxes)
     plt.close(fig)
+
+
+@pytest.mark.parametrize(
+    ("cbar_mode", "cbar_expected"),
+    [(None, False), ("single", True), ("edge", True), ("each", True)],
+)
+def test_faceted_ax(cbar_mode, cbar_expected):
+    if cbar_expected:
+        fig, ax, cax = faceted_ax(
+            cbar_mode=cbar_mode, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT
+        )
+        assert isinstance(fig, matplotlib.figure.Figure)
+        assert isinstance(ax, matplotlib.axes.Axes)
+        assert isinstance(cax, matplotlib.axes.Axes)
+    else:
+        fig, ax = faceted_ax(
+            cbar_mode=cbar_mode, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT
+        )
+        assert isinstance(fig, matplotlib.figure.Figure)
+        assert isinstance(ax, matplotlib.axes.Axes)
