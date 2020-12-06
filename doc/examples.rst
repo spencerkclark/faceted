@@ -311,6 +311,41 @@ specifying ``cbar_mode='each'`` as an argument in the call to :py:meth:`faceted.
     fig.show()
 
 
+Creating a single-axis figure
+-----------------------------
+
+For convenience, :py:mod:`faceted` comes with a function built specifically for creating
+single-axis figures called :py:meth:`faceted.faceted_ax`.  It takes alls the same keyword
+arguments as :py:meth:`faceted.faceted` but returns scalar ``Axes`` objects.
+
+.. ipython:: python
+    :okwarning:
+
+    from faceted import faceted_ax
+
+    tick_locator = ticker.MaxNLocator(nbins=3)
+    
+    aspect = 60. / 130.
+    fig, ax, cax = faceted_ax(width=8, aspect=aspect, right_pad=0.75,
+                              cbar_mode='each',
+                              cbar_pad=0.1, internal_pad=(0.75, 0.1),
+                              cbar_location='right', cbar_short_side_pad=0.,
+    c = ds.air.isel(time=0).plot(
+        ax=ax, add_colorbar=False, transform=ccrs.PlateCarree(),
+        cmap='viridis', vmin=230, vmax=305)
+    ax.set_title('')
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
+    ax.coastlines()
+    cb = plt.colorbar(c, cax=cax, label='[C]')
+    cb.locator = tick_locator
+    cb.update_ticks()
+        
+    @savefig example_tair_each_cbar_faceted_ax.png
+    fig.show()
+
+
 Parameter defintions
 --------------------
 
