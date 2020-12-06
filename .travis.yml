@@ -37,9 +37,9 @@ script:
   - which python
   - python --version
   - if [[ "$CONDA_ENV" == "docs" ]]; then
+      py.test faceted --cov=faceted --cov-report term-missing --verbose;
       cd doc;
       sphinx-build -n -j auto -b html -d _build/doctrees . _build/html;
-      py.test faceted --cov=faceted --cov-report term-missing --verbose;
     else
       black --check --exclude _version.py .;
       py.test faceted --cov=faceted --cov-report term-missing --verbose;
