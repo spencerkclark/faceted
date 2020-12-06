@@ -6,7 +6,7 @@ What's New
 
 .. _whats-new.0.2:
 
-v0.2 (unreleased)
+v0.2 (2020-12-06)
 =================
 
 - :py:meth:`faceted.faceted` now supports three types of constrained figures:
