@@ -330,6 +330,7 @@ arguments as :py:meth:`faceted.faceted` but returns scalar ``Axes`` objects.
                               cbar_mode='each',
                               cbar_pad=0.1, internal_pad=(0.75, 0.1),
                               cbar_location='right', cbar_short_side_pad=0.,
+                              axes_kwargs={'projection': ccrs.PlateCarree()})
     c = ds.air.isel(time=0).plot(
         ax=ax, add_colorbar=False, transform=ccrs.PlateCarree(),
         cmap='viridis', vmin=230, vmax=305)
