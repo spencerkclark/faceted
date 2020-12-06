@@ -230,7 +230,7 @@ a figure.
         ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
 
-    plt.colorbar(c, cax=cax, orientation='horizontal', label='Temperature [C]');
+    plt.colorbar(c, cax=cax, orientation='horizontal', label='Temperature [K]');
         
     @savefig example_tair_single_cbar.png
     fig.show()
@@ -260,7 +260,7 @@ We'll show an example where the rows share a colorbar.
         ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
 
-    plt.colorbar(c1, cax=cax1, label='[C]');
+    plt.colorbar(c1, cax=cax1, label='[K]');
 
     for i, ax in enumerate(axes[3:], start=3):
         c2 = ds.air.isel(time=i).plot(
@@ -272,7 +272,7 @@ We'll show an example where the rows share a colorbar.
         ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
 
-    plt.colorbar(c2, cax=cax2, label='[C]');
+    plt.colorbar(c2, cax=cax2, label='[K]');
         
     @savefig example_tair_edge_cbar.png
     fig.show()
@@ -303,7 +303,7 @@ specifying ``cbar_mode='each'`` as an argument in the call to :py:meth:`faceted.
         ax.set_ylabel('')
         ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
         ax.coastlines()
-        cb = plt.colorbar(c, cax=cax, label='[C]')
+        cb = plt.colorbar(c, cax=cax, label='[K]')
         cb.locator = tick_locator
         cb.update_ticks()
         
@@ -339,7 +339,7 @@ arguments as :py:meth:`faceted.faceted` but returns scalar ``Axes`` objects.
     ax.set_ylabel('')
     ax.set_extent([-160, -30, 15, 75], crs=ccrs.PlateCarree())
     ax.coastlines()
-    cb = plt.colorbar(c, cax=cax, label='[C]')
+    cb = plt.colorbar(c, cax=cax, label='[K]')
     cb.locator = tick_locator
     cb.update_ticks()
         
