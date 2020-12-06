@@ -33,10 +33,7 @@ axes ticks, ticklabels, and labels).  This eliminates the need for using
 `bbox_inches='tight'` when saving the figure, and enables you 
 to make sure that your figures are *exactly* the dimensions you need for your use.
 
-I intend to keep the scope of this project quite limited.  With the exception
-of adding support for two other natural types of dimensionally constrained
-figures ([#15](https://github.com/spencerkclark/faceted/issues/15)), I do not
-plan on adding any more features to this library.  I want the results it
+I intend to keep the scope of this project quite limited. I want the results it
 produces to remain extremely easy to understand and control.  For more
 complicated figure layouts, e.g. multiple panels with different sizes and
 aspect ratios, and a more magical approach to setting figure boundary padding
