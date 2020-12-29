@@ -38,17 +38,12 @@ jobs:
 
     - name: Run tests
       shell: bash -l {0}
-      run: |
-        source activate test
-        coverage run --source=faceted -m pytest -vv faceted -k faceted_cbar_mode
-
-    - name: Coveralls parallel
-      shell: bash -l {0}
       env:
         COVERALLS_PARALLEL: true
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         source activate test
+        coverage run --source=faceted -m pytest -vv faceted -k faceted_cbar_mode
         coveralls
 
   finish:
