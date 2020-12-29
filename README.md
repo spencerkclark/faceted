@@ -1,7 +1,7 @@
 faceted
 =======
 
-[![Build Status](https://github.com/spencerkclark/faceted/workflows/faceted-ci/badge.svg)](https://github.com/spencerkclark/faceted/actions)[![codecov](https://codecov.io/gh/spencerkclark/faceted/branch/master/graph/badge.svg?token=H1DBBSTQ2V)](https://codecov.io/gh/spencerkclark/faceted)[![Documentation Status](https://readthedocs.org/projects/faceted/badge/?version=latest)](https://faceted.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://github.com/spencerkclark/faceted/workflows/faceted-ci/badge.svg?branch=master)](https://github.com/spencerkclark/faceted/actions)[![codecov](https://codecov.io/gh/spencerkclark/faceted/branch/master/graph/badge.svg?token=H1DBBSTQ2V)](https://codecov.io/gh/spencerkclark/faceted)[![Documentation Status](https://readthedocs.org/projects/faceted/badge/?version=latest)](https://faceted.readthedocs.io/en/latest/?badge=latest)
 
 Figures with precise control over overall width, overall height,
 plot aspect ratio, between-plot spacing, and colorbar dimensions.
