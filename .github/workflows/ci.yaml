@@ -26,7 +26,8 @@ jobs:
     - name: Create conda environment
       shell: bash -l {0}
       run: |
-        conda env update --file ci/environment.yml
+        conda env create --file ci/environment.yml
+        source activate test
         pip install -v -e . --no-deps
         conda info --all
         conda list
