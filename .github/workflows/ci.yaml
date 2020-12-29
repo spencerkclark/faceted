@@ -1,4 +1,4 @@
-\0;95;0cname: faceted test
+name: faceted test
 
 on:
   pull_request:
