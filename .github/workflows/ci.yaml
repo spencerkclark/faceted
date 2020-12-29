@@ -1,4 +1,4 @@
-name: faceted test
+\0;95;0cname: faceted test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [master]
 
 jobs:
-  test:
+  pytest:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,7 +40,7 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate test
-        pytest -vv faceted --cov=faceted --cov-report=xml -k faceted_cbar_mode
+        pytest -vv faceted --cov=faceted --cov-report=xml
 
     - name: Upload code coverage to Codecov
       uses: codecov/codecov-action@v1
@@ -49,3 +49,40 @@ jobs:
         flags: unittests,${{ matrix.python-version }}
         name: codecov-umbrella
         fail_ci_if_error: false
+
+  sphinx:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ["3.7"]
+        os: [ubuntu-latest]
+        platform: [x64]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up conda
+      uses: s-weigand/setup-conda@v1
+      with:
+        activate-conda: false
+        conda-channels: conda-forge
+
+    - name: Create conda environment
+      shell: bash -l {0}
+      run: |
+        conda env create --file doc/environment.yml
+        source activate faceted-docs
+        pip install -v -e . --no-deps
+
+    - name: Environment information
+      shell: bash -l {0}
+      run: |
+        source activate faceted-docs
+        conda info --all
+        conda list
+
+    - name: Test the documentation builds
+      shell: bash -l {0}
+      run: |
+        source activate faceted-docs
+        cd doc
+        sphinx-build -n -j auto -b html -d _build/doctrees . _build/html
