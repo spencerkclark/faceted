@@ -6,14 +6,13 @@ on:
     branches: [master]
 
 jobs:
-  run:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: ["3.7"]#, "3.8", "3.9"]
         os: [ubuntu-latest]
         platform: [x64]
-
 
     steps:
     - uses: actions/checkout@v2
@@ -36,11 +35,21 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate test
-        pytest -vv faceted
+        pytest -vv faceted --cov=faceted --cov-report=xml
 
-    - name: Send data to coveralls
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        source activate test
-        coveralls
+    - name: Coveralls parallel
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.test_number }}
+        parallel: true
+
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
