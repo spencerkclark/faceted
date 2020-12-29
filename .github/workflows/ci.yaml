@@ -26,17 +26,14 @@ jobs:
     - name: Create conda environment
       shell: bash -l {0}
       run: |
-        conda init bash
-        conda create --name test python=${{ matrix.python-version }} --file ci/environment.yml
-        conda activate test
-        pip install -v -e .
+        conda env update --file ci/environment.yml
+        pip install -v -e . --no-deps
         conda info --all
         conda list
 
     - name: Run tests
       shell: bash -l {0}
       run: |
-        conda activate test
         pytest -vv faceted
 
     - name: Send data to coveralls
