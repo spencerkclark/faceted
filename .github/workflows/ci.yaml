@@ -35,7 +35,8 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate test
-        pytest -vv faceted --cov=faceted --cov-report=xml
+        pytest -vv faceted --cov=faceted -k faceted_cbar_mode
+        coveralls --output=coverage.json
 
     - name: Coveralls parallel
       uses: coverallsapp/github-action@master
@@ -53,5 +54,5 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.github_token }}
-        path-to-lcov: ./coverage.xml
+        path-to-lcov: ./coverage.json
         parallel-finished: true
