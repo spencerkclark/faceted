@@ -26,6 +26,7 @@ jobs:
     - name: Create conda environment
       shell: bash -l {0}
       run: |
+        conda init bash
         conda create --name test python=${{ matrix.python-version }} --file ci/environment.yml
         conda activate test
         pip install -v -e .
