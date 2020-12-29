@@ -1,0 +1,46 @@
+name: faceted test
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9"]
+        os: [ubuntu-latest]
+        platform: [x64, x32]
+
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up conda
+      uses: s-weigand/setup-conda@v1
+      with:
+        activate-conda: false
+        conda-channels: conda-forge
+
+    - name: Create conda environment
+      shell: bash -l {0}
+      run: |
+        conda create --name test python=${{ matrix.python-version }} --file ci/environment.yml
+        conda activate test
+        pip install -v -e .
+        conda info --all
+        conda list
+
+    - name: Run tests
+      shell: bash -l {0}
+      run: |
+        conda activate test
+        pytest -vv faceted
+
+    - name: Send data to coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run:
+        conda activate test
+        coveralls
