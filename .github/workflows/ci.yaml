@@ -28,6 +28,11 @@ jobs:
         conda env create --file ci/environment.yml
         source activate test
         pip install -v -e . --no-deps
+
+    - name: Environment information
+      shell: bash -l {0}
+      run: |
+        source activate test
         conda info --all
         conda list
 
@@ -35,16 +40,13 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate test
-        pytest -vv faceted --cov=faceted -k faceted_cbar_mode
-        coveralls --output=coverage.json
+        coverage run --source=faceted -m pytest -vv faceted -k faceted_cbar_mode
 
     - name: Coveralls parallel
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        flag-name: run-${{ matrix.python-version }}
-        path-to-lcov: ./coverage.xml
-        parallel: true
+      env:
+        COVERALLS_PARALLEL: true
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: coveralls
 
   finish:
     needs: test
@@ -54,5 +56,4 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.github_token }}
-        path-to-lcov: ./coverage.json
         parallel-finished: true
