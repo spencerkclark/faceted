@@ -43,9 +43,9 @@ jobs:
         pytest -vv faceted --cov=faceted --cov-report=xml -k faceted_cbar_mode
 
     - name: Upload code coverage to Codecov
-       uses: codecov/codecov-action@v1
-       with:
-         file: ./coverage.xml
-         flags: unittests,${{ matrix.python-version }}
-         name: codecov-umbrella
-         fail_ci_if_error: false
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+        flags: unittests,${{ matrix.python-version }}
+        name: codecov-umbrella
+        fail_ci_if_error: false
