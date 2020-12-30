@@ -1,3 +1,4 @@
+# Configuration taken from xarray
 codecov:
   require_ci_to_pass: yes
 
