@@ -111,7 +111,7 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate black
-        black --check .
+        black --check --exclude _version.py faceted
 
   flake8:
     runs-on: ${{ matrix.os }}
