@@ -80,9 +80,49 @@ jobs:
         conda info --all
         conda list
 
-    - name: Test the documentation builds
+    - name: Test that the documentation builds
       shell: bash -l {0}
       run: |
         source activate faceted-docs
         cd doc
         sphinx-build -n -j auto -b html -d _build/doctrees . _build/html
+
+  black:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ["3.7"]
+        os: [ubuntu-latest]
+        platform: [x64]
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install black
+      shell: bash -l {0}
+      run: |
+        python -m pip install black
+
+    - name: black --check .
+      shell: bash -l {0}
+      run: black --check .
+
+  flake8:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ["3.7"]
+        os: [ubuntu-latest]
+        platform: [x64]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install flake8
+      shell: bash -l {0}
+      run: |
+        python -m pip install flake8
+
+    - name: flake8
+      shell: bash -l {0}
+      run: flake8

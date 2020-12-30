@@ -4,6 +4,7 @@ channels:
 dependencies:
     - black
     - cartopy
+    - flake8
     - jupyter
     - matplotlib
     - numpy
