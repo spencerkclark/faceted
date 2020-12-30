@@ -23,21 +23,18 @@ jobs:
         conda-channels: conda-forge
 
     - name: Create conda environment
-      shell: bash -l {0}
       run: |
         conda env create --file ci/environment.yml
         source activate test
         pip install -v -e . --no-deps
 
     - name: Environment information
-      shell: bash -l {0}
       run: |
         source activate test
         conda info --all
         conda list
 
     - name: Run tests
-      shell: bash -l {0}
       run: |
         source activate test
         pytest -vv faceted --cov=faceted --cov-report=xml
@@ -67,21 +64,18 @@ jobs:
         conda-channels: conda-forge
 
     - name: Create conda environment
-      shell: bash -l {0}
       run: |
         conda env create --file doc/environment.yml
         source activate faceted-docs
         pip install -v -e . --no-deps
 
     - name: Environment information
-      shell: bash -l {0}
       run: |
         source activate faceted-docs
         conda info --all
         conda list
 
     - name: Test that the documentation builds
-      shell: bash -l {0}
       run: |
         source activate faceted-docs
         cd doc
@@ -107,8 +101,7 @@ jobs:
       shell: bash -l {0}
       run: conda create --name black python=3.7 black
 
-    - name: black --check .
-      shell: bash -l {0}
+    - name: black --check
       run: |
         source activate black
         black --check --exclude _version.py faceted
@@ -130,11 +123,9 @@ jobs:
         conda-channels: conda-forge
         
     - name: Install flake8
-      shell: bash -l {0}
       run: conda create --name flake8 python=3.7 flake8
 
     - name: flake8
-      shell: bash -l {0}
       run: |
         source activate flake8
         flake8
