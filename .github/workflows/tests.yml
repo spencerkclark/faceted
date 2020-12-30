@@ -1,4 +1,4 @@
-name: Tests
+name: tests
 
 on:
   pull_request:
@@ -101,7 +101,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     
     - name: Install black
-      shell: bash -l {0}
       run: conda create --name black python=3.7 black
 
     - name: black --check
