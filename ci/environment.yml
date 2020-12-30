@@ -1,10 +1,10 @@
-name: test_env
+name: test
 channels:
     - conda-forge
 dependencies:
-    - python=3.6
     - black
     - cartopy
+    - flake8
     - jupyter
     - matplotlib
     - numpy

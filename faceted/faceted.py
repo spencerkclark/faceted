@@ -121,7 +121,7 @@ def faceted_ax(cbar_mode=None, **kwargs):
     """A convenience version of faceted for creating single-axis figures.
 
     Exactly two of width, height, and aspect must be defined.  The third is
-    inferred based on the other two values.  
+    inferred based on the other two values.
 
     Parameters
     ----------
