@@ -9,6 +9,13 @@ What's New
 v0.3 (unreleased)
 =================
 
+- Defaults for the ``width``, ``height``, and ``aspect`` are now chosen if fewer
+  than two of those are specified in :py:meth:`faceted.faceted`.  This restores
+  the old defaults from version 0.1 without changing the function signature
+  introduced to provide an interface to more varieties of constrained figures in
+  version 0.2.  E.g. calls like ``faceted(1, 1)`` or ``faceted(1, 1, width=5.0)``
+  are now allowed again.
+
 .. _whats-new.0.2:
 
 v0.2 (2020-12-06)

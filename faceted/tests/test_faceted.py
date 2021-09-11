@@ -9,8 +9,11 @@ import numpy as np
 import pytest
 
 from ..faceted import (
+    _DEFAULT_ASPECT,
+    _DEFAULT_WIDTH,
     faceted,
     faceted_ax,
+    _infer_constraints,
     _infer_grid_class,
     HeightConstrainedAxesGrid,
     HeightAndWidthConstrainedAxesGrid,
@@ -76,18 +79,26 @@ def test_faceted_invalid_internal_pad():
 
 
 @pytest.mark.parametrize(
-    ("width", "height", "aspect"),
+    ("inputs", "expected"),
     [
-        (None, None, None),
-        (5.0, None, None),
-        (None, 5.0, None),
-        (None, None, 5.0),
-        (5.0, 5.0, 5.0),
+        ((None, None, None), (_DEFAULT_WIDTH, None, _DEFAULT_ASPECT)),
+        ((3.0, None, None), (3.0, None, _DEFAULT_ASPECT)),
+        ((None, 3.0, None), (None, 3.0, _DEFAULT_ASPECT)),
+        ((None, None, 3.0), (_DEFAULT_WIDTH, None, 3.0)),
+        ((3.0, 3.0, None), (3.0, 3.0, None)),
+        ((None, 3.0, 3.0), (None, 3.0, 3.0)),
+        ((3.0, None, 3.0), (3.0, None, 3.0)),
+        ((3.0, 3.0, 3.0), ValueError)
     ],
+    ids=lambda x: str(x)
 )
-def test_faceted_invalid_constraints(width, height, aspect):
-    with pytest.raises(ValueError, match="Exactly"):
-        faceted(1, 2, width=width, height=height, aspect=aspect)
+def test__infer_constraints(inputs, expected):
+    if not isinstance(expected, tuple) and issubclass(expected, Exception):
+        with pytest.raises(expected):
+            _infer_constraints(*inputs)
+    else:
+        result = _infer_constraints(*inputs)
+        assert result == expected
 
 
 @pytest.mark.parametrize(
