@@ -88,9 +88,9 @@ def test_faceted_invalid_internal_pad():
         ((3.0, 3.0, None), (3.0, 3.0, None)),
         ((None, 3.0, 3.0), (None, 3.0, 3.0)),
         ((3.0, None, 3.0), (3.0, None, 3.0)),
-        ((3.0, 3.0, 3.0), ValueError)
+        ((3.0, 3.0, 3.0), ValueError),
     ],
-    ids=lambda x: str(x)
+    ids=lambda x: str(x),
 )
 def test__infer_constraints(inputs, expected):
     if not isinstance(expected, tuple) and issubclass(expected, Exception):

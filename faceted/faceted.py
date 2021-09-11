@@ -207,7 +207,9 @@ _BT = ["bottom", "top"]
 
 def _infer_constraints(width, height, aspect):
     if all(constraint is not None for constraint in (width, height, aspect)):
-        raise ValueError("At most two of 'width', 'height', and 'aspect' must be provided.")
+        raise ValueError(
+            "At most two of 'width', 'height', and 'aspect' must be provided."
+        )
     elif all(constraint is None for constraint in (width, height, aspect)):
         return _DEFAULT_WIDTH, None, _DEFAULT_ASPECT
     elif width is not None and height is None and aspect is None:
