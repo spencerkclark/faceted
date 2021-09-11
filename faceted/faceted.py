@@ -28,8 +28,18 @@ def faceted(
 ):
     """Create figure and tiled axes objects with precise attributes.
 
-    Exactly two of width, height, and aspect must be defined.  The third is
-    inferred based on the other two values.
+    In general exactly two of width, height, and aspect should be defined.
+    However, if none or one of them are defined then reasonable defaults are
+    selected:
+
+    - If none are provided the width is assumed to be ``8.0`` inches the aspect
+      is assumed to be ``0.618``.
+    - If only a ``width`` is provided, the ``aspect`` is assumed to be
+      ``0.618``.
+    - If only a ``height`` is provided, the ``aspect`` is assumed to be
+      ``0.618``.
+    - If only an ``aspect`` is provided, the ``width`` is assumed to be ``8.0``
+      inches.
 
     Parameters
     ----------
@@ -90,6 +100,7 @@ def faceted(
     if cbar_mode not in [None, "single", "edge", "each"]:
         raise ValueError(f"Invalid cbar mode provided.  Got {cbar_mode}.")
 
+    width, height, aspect = _infer_constraints(width, height, aspect)
     grid_class = _infer_grid_class(width, height, aspect)
     grid = grid_class(
         rows,
@@ -120,8 +131,18 @@ def faceted(
 def faceted_ax(cbar_mode=None, **kwargs):
     """A convenience version of faceted for creating single-axis figures.
 
-    Exactly two of width, height, and aspect must be defined.  The third is
-    inferred based on the other two values.
+    In general exactly two of width, height, and aspect should be defined.
+    However, if none or one of them are defined then reasonable defaults are
+    selected:
+
+    - If none are provided the width is assumed to be ``8.0`` inches the aspect
+      is assumed to be ``0.618``.
+    - If only a ``width`` is provided, the ``aspect`` is assumed to be
+      ``0.618``.
+    - If only a ``height`` is provided, the ``aspect`` is assumed to be
+      ``0.618``.
+    - If only an ``aspect`` is provided, the ``width`` is assumed to be ``8.0``
+      inches.
 
     Parameters
     ----------
@@ -178,18 +199,30 @@ def faceted_ax(cbar_mode=None, **kwargs):
         return fig, ax, cax
 
 
+_DEFAULT_WIDTH = 8.0
+_DEFAULT_ASPECT = 0.618
 _LR = ["left", "right"]
 _BT = ["bottom", "top"]
 
 
-def _assert_valid_constraint(width, height, aspect):
-    constraints = (width, height, aspect)
-    if not (sum(constraint is not None for constraint in constraints) == 2):
-        raise ValueError("Exactly two of width, height, and aspect must be floats")
+def _infer_constraints(width, height, aspect):
+    if all(constraint is not None for constraint in (width, height, aspect)):
+        raise ValueError(
+            "At most two of 'width', 'height', and 'aspect' must be provided."
+        )
+    elif all(constraint is None for constraint in (width, height, aspect)):
+        return _DEFAULT_WIDTH, None, _DEFAULT_ASPECT
+    elif width is not None and height is None and aspect is None:
+        return width, None, _DEFAULT_ASPECT
+    elif height is not None and width is None and aspect is None:
+        return None, height, _DEFAULT_ASPECT
+    elif aspect is not None and width is None and height is None:
+        return _DEFAULT_WIDTH, None, aspect
+    else:
+        return width, height, aspect
 
 
 def _infer_grid_class(width, height, aspect):
-    _assert_valid_constraint(width, height, aspect)
     if width is not None and aspect is not None:
         return WidthConstrainedAxesGrid
     elif height is not None and aspect is not None:
