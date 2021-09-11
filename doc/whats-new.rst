@@ -9,6 +9,11 @@ What's New
 v0.3 (unreleased)
 =================
 
+.. _whats-new.0.2.1:
+
+v0.2.1 (2021-09-11)
+===================
+
 - Defaults for the ``width``, ``height``, and ``aspect`` are now chosen if fewer
   than two of those are specified in :py:meth:`faceted.faceted`.  This restores
   the old defaults from version 0.1 without changing the function signature
