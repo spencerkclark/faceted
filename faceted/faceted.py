@@ -32,8 +32,8 @@ def faceted(
     However, if none or one of them are defined then reasonable defaults are
     selected:
 
-    - If none are provided the width is assumed to be ``8.0`` inches the aspect
-      is assumed to be ``0.618``.
+    - If none are provided the width is assumed to be ``8.0`` inches and the
+      aspect is assumed to be ``0.618``.
     - If only a ``width`` is provided, the ``aspect`` is assumed to be
       ``0.618``.
     - If only a ``height`` is provided, the ``aspect`` is assumed to be
@@ -135,8 +135,8 @@ def faceted_ax(cbar_mode=None, **kwargs):
     However, if none or one of them are defined then reasonable defaults are
     selected:
 
-    - If none are provided the width is assumed to be ``8.0`` inches the aspect
-      is assumed to be ``0.618``.
+    - If none are provided the width is assumed to be ``8.0`` inches and the 
+      aspect is assumed to be ``0.618``.
     - If only a ``width`` is provided, the ``aspect`` is assumed to be
       ``0.618``.
     - If only a ``height`` is provided, the ``aspect`` is assumed to be
