@@ -3,7 +3,7 @@ channels:
     - conda-forge
 dependencies:
     - python==3.7
-    - cartopy
+    - cartopy==0.20.1
     - jupyter
     - matplotlib
     - nc-time-axis
