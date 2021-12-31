@@ -36,6 +36,10 @@ _LONG_SIDE_PAD = 0.25
 _CBAR_THICKNESS = 0.125
 
 
+def get_bounds(fig, ax):
+    return ax.bbox.transformed(fig.transFigure.inverted()).bounds
+
+
 def test_faceted_cbar_mode_none():
     fig, axes = faceted(1, 2, width=_WIDTH_CONSTRAINT, aspect=_ASPECT_CONSTRAINT)
     assert len(axes) == 2
@@ -229,7 +233,7 @@ def test_plot_aspect(grid):
     fig = grid.fig
     width, height = fig.get_size_inches()
     for ax in grid.axes:
-        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+        ax_bounds = get_bounds(fig, ax)
         _, _, _plot_width, _plot_height = ax_bounds
         plot_width = _plot_width * width
         plot_height = _plot_height * height
@@ -246,7 +250,7 @@ def check_constrained_axes_positions_none(grid):
 
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     for ax, (row, col) in zip(grid.axes, indexes):
-        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+        ax_bounds = get_bounds(fig, ax)
         x0 = (_LEFT_PAD + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)) / width
         y0 = (_BOTTOM_PAD + row * (_VERTICAL_INTERNAL_PAD + tile_height)) / height
         dx = tile_width / width
@@ -278,7 +282,7 @@ def check_constrained_axes_positions_single(grid):
     indexes = list(product(range(rows - 1, -1, -1), range(cols)))
     axes = grid.axes
     for ax, (row, col) in zip(axes, indexes):
-        ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+        ax_bounds = get_bounds(fig, ax)
         x0 = (left_pad + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)) / width
         y0 = (bottom_pad + row * (_VERTICAL_INTERNAL_PAD + tile_height)) / height
         dx = tile_width / width
@@ -293,7 +297,7 @@ def check_constrained_caxes_positions_single(grid):
     fig = grid.fig
 
     cax = grid.caxes
-    cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+    cax_bounds = get_bounds(fig, cax)
     if cbar_location == "bottom":
         x0 = (_LEFT_PAD + _SHORT_SIDE_PAD) / width
         y0 = _BOTTOM_PAD / height
@@ -329,7 +333,7 @@ def check_constrained_axes_positions_each(grid):
     axes = grid.axes
     if cbar_location == "bottom":
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            ax_bounds = get_bounds(fig, ax)
             x0 = (_LEFT_PAD + col * (tile_width + _HORIZONTAL_INTERNAL_PAD)) / width
             y0 = (
                 _BOTTOM_PAD
@@ -343,7 +347,7 @@ def check_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == "top":
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            ax_bounds = get_bounds(fig, ax)
             x0 = (_LEFT_PAD + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_VERTICAL_INTERNAL_PAD + tile_height)) / height
             dx = tile_width / width
@@ -352,7 +356,7 @@ def check_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == "right":
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            ax_bounds = get_bounds(fig, ax)
             x0 = (_LEFT_PAD + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)) / width
             y0 = (_BOTTOM_PAD + row * (_VERTICAL_INTERNAL_PAD + tile_height)) / height
             dx = (tile_width - _CBAR_THICKNESS - _LONG_SIDE_PAD) / width
@@ -361,7 +365,7 @@ def check_constrained_axes_positions_each(grid):
             np.testing.assert_allclose(ax_bounds, expected_bounds)
     elif cbar_location == "left":
         for ax, (row, col) in zip(axes, indexes):
-            ax_bounds = ax.bbox.inverse_transformed(fig.transFigure).bounds
+            ax_bounds = get_bounds(fig, ax)
             x0 = (
                 _LEFT_PAD
                 + _CBAR_THICKNESS
@@ -386,7 +390,7 @@ def check_constrained_caxes_positions_each(grid):
     caxes = grid.caxes
     if cbar_location == "bottom":
         for cax, (row, col) in zip(caxes, indexes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (
                 _LEFT_PAD
                 + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)
@@ -399,7 +403,7 @@ def check_constrained_caxes_positions_each(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == "top":
         for cax, (row, col) in zip(caxes, indexes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (
                 _LEFT_PAD
                 + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)
@@ -417,7 +421,7 @@ def check_constrained_caxes_positions_each(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == "right":
         for cax, (row, col) in zip(caxes, indexes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (
                 _LEFT_PAD
                 + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)
@@ -435,7 +439,7 @@ def check_constrained_caxes_positions_each(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == "left":
         for cax, (row, col) in zip(caxes, indexes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (_LEFT_PAD + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)) / width
             y0 = (
                 _BOTTOM_PAD
@@ -463,7 +467,7 @@ def check_constrained_caxes_positions_edge(grid):
     caxes = grid.caxes
     if cbar_location == "bottom":
         for col, cax in zip(range(cols), caxes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (
                 _LEFT_PAD
                 + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)
@@ -476,7 +480,7 @@ def check_constrained_caxes_positions_edge(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == "top":
         for col, cax in zip(range(cols), caxes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (
                 _LEFT_PAD
                 + col * (_HORIZONTAL_INTERNAL_PAD + tile_width)
@@ -489,7 +493,7 @@ def check_constrained_caxes_positions_edge(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == "right":
         for row, cax in zip(range(rows - 1, -1, -1), caxes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = (width - _CBAR_THICKNESS - _RIGHT_PAD) / width
             y0 = (
                 _BOTTOM_PAD
@@ -502,7 +506,7 @@ def check_constrained_caxes_positions_edge(grid):
             np.testing.assert_allclose(cax_bounds, expected_bounds)
     elif cbar_location == "left":
         for row, cax in zip(range(rows - 1, -1, -1), caxes):
-            cax_bounds = cax.bbox.inverse_transformed(fig.transFigure).bounds
+            cax_bounds = get_bounds(fig, cax)
             x0 = _LEFT_PAD / width
             y0 = (
                 _BOTTOM_PAD
