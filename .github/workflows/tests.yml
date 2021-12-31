@@ -24,8 +24,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Create conda environment
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
-        conda env create --file ci/environment.yml
+        conda env create --file ci/environment-${PYTHON_VERSION}.yml
         source activate test
         pip install -v -e . --no-deps
 
@@ -52,7 +54,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.7"]
+        python-version: ["3.9"]
         os: [ubuntu-latest]
         platform: [x64]
 
@@ -87,7 +89,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.7"]
+        python-version: ["3.9"]
         os: [ubuntu-latest]
         platform: [x64]
 
@@ -101,7 +103,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     
     - name: Install black
-      run: conda create --name black python=3.7 black
+      run: conda create --name black python=3.9 black
 
     - name: black --check
       run: |
@@ -112,7 +114,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.7"]
+        python-version: ["3.9"]
         os: [ubuntu-latest]
         platform: [x64]
 
@@ -126,7 +128,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         
     - name: Install flake8
-      run: conda create --name flake8 python=3.7 flake8
+      run: conda create --name flake8 python=3.9 flake8
 
     - name: flake8
       run: |

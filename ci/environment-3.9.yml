@@ -10,6 +10,7 @@ dependencies:
     - numpy
     - pip
     - pytest
+    - python==3.9
     - scipy
     - pip:
       - coveralls
