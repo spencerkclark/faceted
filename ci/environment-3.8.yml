@@ -1,0 +1,17 @@
+name: test
+channels:
+    - conda-forge
+dependencies:
+    - black
+    - cartopy
+    - flake8
+    - jupyter
+    - matplotlib
+    - numpy
+    - pip
+    - pytest
+    - python==3.8
+    - scipy
+    - pip:
+      - coveralls
+      - pytest-cov

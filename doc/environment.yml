@@ -2,7 +2,7 @@ name: faceted-docs
 channels:
     - conda-forge
 dependencies:
-    - python=3.7
+    - python==3.9
     - cartopy
     - jupyter
     - matplotlib
@@ -12,13 +12,13 @@ dependencies:
     - pooch
     - pytest
     - scipy
-    - ipython=7.2.0
-    - cftime=1.0.3.4
-    - sphinx=1.8.2
-    - numpydoc=0.8.0
-    - sphinx-gallery=0.2.0
-    - sphinx_rtd_theme=0.4.2
-    - netCDF4=1.4.2
+    - ipython
+    - cftime
+    - sphinx
+    - numpydoc
+    - sphinx-gallery
+    - sphinx_rtd_theme
+    - netCDF4
     - xarray
     - pip:
       - coveralls
