@@ -1,8 +1,16 @@
+version: 2
+
+sphinx:
+  configuration: docs/conf.py
+
 build:
-    image: latest
-conda:
-    file: doc/environment.yml
+  os: "ubuntu-24.04"
+  tools:
+    python: "3.13"
+
 python:
-    version: 3.6
-    setup_py_install: true
-formats: []
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs

@@ -1,9 +1,14 @@
 from itertools import product
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+from packaging.version import Version
 
 from mpl_toolkits.axes_grid1 import AxesGrid
+
+
+__version__ = "0.2.2"
 
 
 def faceted(
@@ -434,18 +439,18 @@ class ConstrainedAxesGrid(CbarShortSidePadMixin, ShareAxesMixin):
 
     @property
     def axes_grid_cbar_pad(self):
-        """For some reason the colorbar when the colorbar is placed at the
-        bottom or left and the colorbar mode is 'single', AxesGrid adds an
-        extra axes pad to the colorbar padding; we correct this manually
-        here.
-        """
+        # Prior to matplotlib version 3.10.0, when the colorbar is placed at
+        # the bottom or left and the colorbar mode is "single", AxesGrid adds
+        # an extra axes pad to the colorbar padding; we correct this manually
+        # if needed here.
         horizontal_pad, vertical_pad = self.axes_pad
-        if self.cbar_location == "bottom" and self.cbar_mode == "single":
-            return self.cbar_pad - vertical_pad
-        elif self.cbar_location == "left" and self.cbar_mode == "single":
-            return self.cbar_pad - horizontal_pad
-        else:
-            return self.cbar_pad
+        cbar_pad = self.cbar_pad
+        if Version(matplotlib.__version__) < Version("3.10.0"):
+            if self.cbar_location == "bottom" and self.cbar_mode == "single":
+                cbar_pad = self.cbar_pad - vertical_pad
+            elif self.cbar_location == "left" and self.cbar_mode == "single":
+                cbar_pad = self.cbar_pad - horizontal_pad
+        return cbar_pad
 
     @property
     def rect(self):

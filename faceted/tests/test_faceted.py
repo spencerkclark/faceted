@@ -1,4 +1,5 @@
 """Test suite for faceted module"""
+
 from collections import OrderedDict
 from itertools import product
 
