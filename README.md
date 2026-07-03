@@ -1,8 +1,7 @@
 faceted
 =======
 
-[![Build
-Status](https://github.com/spencerkclark/faceted/workflows/tests/badge.svg?branch=master)](https://github.com/spencerkclark/faceted/actions) [![codecov](https://codecov.io/gh/spencerkclark/faceted/branch/master/graph/badge.svg?token=H1DBBSTQ2V)](https://codecov.io/gh/spencerkclark/faceted) [![Documentation
+[![tests](https://github.com/spencerkclark/faceted/actions/workflows/tests.yml/badge.svg)](https://github.com/spencerkclark/faceted/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/spencerkclark/faceted/branch/master/graph/badge.svg?token=H1DBBSTQ2V)](https://codecov.io/gh/spencerkclark/faceted) [![Documentation
 Status](https://readthedocs.org/projects/faceted/badge/?version=latest)](https://faceted.readthedocs.io/en/latest/?badge=latest) [![PyPI](https://img.shields.io/pypi/v/faceted.svg)](https://pypi.python.org/pypi/faceted/) [![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
 Figures with precise control over overall width, overall height,
