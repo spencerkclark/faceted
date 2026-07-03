@@ -3,134 +3,41 @@ name: tests
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main]
+
+env:
+  FORCE_COLOR: 1
 
 jobs:
   pytest:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9"]
+        python-version: ["3.12"]
         os: [ubuntu-latest]
         platform: [x64]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup conda
-      uses: s-weigand/setup-conda@v1
-      with:
-        activate-conda: false
-        conda-channels: conda-forge
-        python-version: ${{ matrix.python-version }}
+    - uses: actions/checkout@v7
 
-    - name: Create conda environment
-      env:
-        PYTHON_VERSION: ${{ matrix.python-version }}
-      run: |
-        conda env create --file ci/environment-${PYTHON_VERSION}.yml
-        source activate test
-        pip install -v -e . --no-deps
+    - uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+  
+    - name: Install faceted
+      run: pip install -e ".[dev]"
 
     - name: Environment information
-      run: |
-        source activate test
-        conda info --all
-        conda list
+      run: python -m pip list
 
     - name: Run tests
-      run: |
-        source activate test
-        pytest -vv faceted --cov=faceted --cov-report=xml
+      run: pytest -vv --cov=xpartition --cov-report=xml
 
     - name: Upload code coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v7
       with:
         file: ./coverage.xml
         flags: unittests,${{ matrix.python-version }}
         name: codecov-umbrella
         fail_ci_if_error: false
-
-  sphinx:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        python-version: ["3.9"]
-        os: [ubuntu-latest]
-        platform: [x64]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup conda
-      uses: s-weigand/setup-conda@v1
-      with:
-        activate-conda: false
-        conda-channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-
-    - name: Create conda environment
-      run: |
-        conda env create --file doc/environment.yml
-        source activate faceted-docs
-        pip install -v -e . --no-deps
-
-    - name: Environment information
-      run: |
-        source activate faceted-docs
-        conda info --all
-        conda list
-
-    - name: Test that the documentation builds
-      run: |
-        source activate faceted-docs
-        cd doc
-        sphinx-build -n -j auto -b html -d _build/doctrees . _build/html
-
-  black:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        python-version: ["3.9"]
-        os: [ubuntu-latest]
-        platform: [x64]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup conda
-      uses: s-weigand/setup-conda@v1
-      with:
-        activate-conda: false
-        conda-channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install black
-      run: conda create --name black python=3.9 black
-
-    - name: black --check
-      run: |
-        source activate black
-        black --check --exclude _version.py faceted
-
-  flake8:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        python-version: ["3.9"]
-        os: [ubuntu-latest]
-        platform: [x64]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup conda
-      uses: s-weigand/setup-conda@v1
-      with:
-        activate-conda: false
-        conda-channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Install flake8
-      run: conda create --name flake8 python=3.9 flake8
-
-    - name: flake8
-      run: |
-        source activate flake8
-        flake8
+        token: ${{ secrets.CODECOV_TOKEN }}
