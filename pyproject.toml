@@ -22,6 +22,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = ["cartopy", "coveralls", "pytest", "pytest-cov"]
+docs = ["cartopy", "cftime", "ipython", "jupyter", "nc-time-axis", "netCDF4", "numpydoc", "pooch", "sphinx", "sphinx-gallery", "sphinx_rtd_theme", "xarray"]
 
 [project.readme]
 file = "README.md"
