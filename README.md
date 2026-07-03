@@ -18,7 +18,7 @@ as possible, but retain a fixed aspect ratio (height divided by width).  Maybe
 some (or all) of your panels require an accompanying colorbar.  With
 out of the box `matplotlib` tools this is actually somewhat tricky.
 
-![readme-example.png](readme-example.png?raw=true)
+![](https://raw.githubusercontent.com/spencerkclark/faceted/main/readme-example.png)
 
 Internally, this module uses the flexible [`matplotlib` `AxesGrid` toolkit](https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html#axes-grid1),
 with some additional logic to enable making these kinds of
