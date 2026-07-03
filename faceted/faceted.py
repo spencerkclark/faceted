@@ -8,7 +8,7 @@ from packaging.version import Version
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
-__version__ = "0.2.2"
+__version__ = "2026.07.0"
 
 
 def faceted(

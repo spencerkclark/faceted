@@ -4,9 +4,9 @@
 What's New
 ##########
 
-.. _whats-new.0.2.2:
+.. _whats-new.2026.07.0:
 
-v0.2.2 (2026-07-03)
+v2026.07.0 (2026-07-03)
 ===================
 
 - Removed workaround for matplotlib colorbar padding issue with ``cbar_mode``
